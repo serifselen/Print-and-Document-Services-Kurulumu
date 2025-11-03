@@ -86,7 +86,10 @@ Install-WindowsFeature -Name Print-Services -IncludeManagementTools
 Get-WindowsFeature -Name Print-Services
 ```
 
-**📷 Referans:** `2.png` - Server Manager Dashboard ve "Add Roles and Features Wizard" ekranı
+**📷 Referans Görsel:**
+
+![Server Manager - Add Roles and Features](Images/2.png)
+*Resim: Server Manager Dashboard'da Print and Document Services rolü seçimi ekranı*
 
 ---
 
@@ -121,7 +124,10 @@ Import-Module PrintManagement
 Get-Command -Module PrintManagement
 ```
 
-**📷 Referans:** `3.png` - Management tools onay ekranı
+**📷 Referans Görsel:**
+
+![Add Features Dialog](Images/3.png)
+*Resim: Print and Document Services için gerekli yönetim araçlarının eklenmesi*
 
 ---
 
@@ -153,7 +159,10 @@ Get-Command -Module PrintManagement
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `4.png` - Print and Document Services bilgilendirme ekranı
+**📷 Referans Görsel:**
+
+![Print and Document Services Configuration](Images/4.png)
+*Resim: Print and Document Services yapılandırma ekranı - Yazıcı sürücü türleri ve güvenlik notları*
 
 ---
 
@@ -208,7 +217,10 @@ Get-WindowsFeature -Name Print-Internet
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `5.png` - Role Services seçim ekranı
+**📷 Referans Görsel:**
+
+![Select Role Services](Images/5.png)
+*Resim: Print Server, Internet Printing ve LPD Service seçimi ekranı*
 
 ---
 
@@ -266,7 +278,10 @@ Get-EventLog -LogName System -Source "Service Control Manager" -Newest 20 | Wher
 
 **Install** butonuna tıklanarak kurulum başlatılır.
 
-**📷 Referans:** `6.png` - Installation confirmation ekranı
+**📷 Referans Görsel:**
+
+![Confirm Installation](Images/6.png)
+*Resim: Kurulum onay ekranı - Yüklenecek bileşenlerin listesi*
 
 ---
 
@@ -324,7 +339,10 @@ Get-Printer | Measure-Object | Select-Object Count
 Get-Printer | Select-Object Name, PrinterStatus, JobCount
 ```
 
-**📷 Referans:** `7.png` - Windows Tools menüsü ve Print Management erişimi
+**📷 Referans Görsel:**
+
+![Windows Tools - Print Management](Images/7.png)
+*Resim: Windows Tools menüsünden Print Management konsoluna erişim*
 
 ---
 
@@ -366,7 +384,10 @@ Get-Printer -Name "Microsoft Print to PDF" | Format-List *
 Get-PrinterDriver | Select-Object Name, Manufacturer, PrinterEnvironment
 ```
 
-**📷 Referans:** `8.png` - Print Management konsolu ana ekranı
+**📷 Referans Görsel:**
+
+![Print Management Console](Images/8.png)
+*Resim: Print Management konsolu ana ekranı - Varsayılan Microsoft Print to PDF yazıcısı*
 
 ---
 
@@ -400,7 +421,10 @@ Add-PrinterDriver -Name "Microsoft XPS Document Writer v4"
 Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v4" -PortName "IP_192.168.31.201"
 ```
 
-**📷 Referans:** `9.png` - Sağ tık menüsü ve Add Printer seçeneği
+**📷 Referans Görsel:**
+
+![Add Printer Menu](Images/9.png)
+*Resim: Printers klasörü sağ tık menüsü - Add Printer seçeneği*
 
 ---
 
@@ -451,7 +475,10 @@ Add-PrinterPort -Name "IP_192.168.31.201" -PrinterHostAddress "192.168.31.201"
 Add-PrinterPort -Name "LPR_192.168.31.201" -LprHostAddress "192.168.31.201" -LprQueue "PASSTHRU"
 ```
 
-**📷 Referans:** `10.png` - Printer Installation yöntem seçimi
+**📷 Referans Görsel:**
+
+![Printer Installation Method](Images/10.png)
+*Resim: Yazıcı kurulum yöntemi seçimi - TCP/IP yazıcı ekleme*
 
 ---
 
