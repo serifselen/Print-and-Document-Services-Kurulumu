@@ -1,13 +1,27 @@
 # 🖨️ Windows Server Print and Document Services Kurulumu
 
-Bu rehber, Windows Server 2019/2022 sistemine Print and Document Services rolünün nasıl kurulacağını ve ağ yazıcısı ekleme işlemlerini adım adım açıklar. Kurulum, Server Manager aracılığıyla gerçekleştirilir.
+Bu rehber, Windows Server 2019/2022/2025 sistemine Print and Document Services rolünün nasıl kurulacağını ve ağ yazıcısı ekleme işlemlerini adım adım açıklar. Kurulum, Server Manager aracılığıyla gerçekleştirilir.
 
 ## 📋 İçindekiler
 
 - [Ön Gereksinimler ve Hazırlık](#-ön-gereksinimler-ve-hazırlık)
 - [Print and Document Services Kurulum Adımları](#-print-and-document-services-kurulum-adımları)
+  - [Adım 1: Server Manager'dan Role Ekleme](#adım-1-server-managerdan-role-ekleme)
+  - [Adım 2: Gerekli Yönetim Araçlarının Eklenmesi](#adım-2-gerekli-yönetim-araçlarının-eklenmesi)
+  - [Adım 3: Print and Document Services Yapılandırması](#adım-3-print-and-document-services-yapılandırması)
+  - [Adım 4: Role Services Seçimi](#adım-4-role-services-seçimi)
+  - [Adım 5: Kurulum Onayı](#adım-5-kurulum-onayı)
 - [Print Management Konsolu](#-print-management-konsolu)
+  - [Adım 6: Print Management'ı Açma](#adım-6-print-managementı-açma)
+  - [Adım 7: Mevcut Yazıcı Durumu](#adım-7-mevcut-yazıcı-durumu)
 - [Ağ Yazıcısı Ekleme](#-ağ-yazıcısı-ekleme)
+  - [Adım 8: Network Printer Installation Wizard Başlatma](#adım-8-network-printer-installation-wizard-başlatma)
+  - [Adım 9: Yazıcı Kurulum Yöntemi Seçimi](#adım-9-yazıcı-kurulum-yöntemi-seçimi)
+  - [Adım 10: Yazıcı IP Adresi Girişi](#adım-10-yazıcı-ip-adresi-girişi)
+  - [Adım 11: Yazıcı Sürücüsü Seçimi](#adım-11-yazıcı-sürücüsü-seçimi)
+  - [Adım 12: Yazıcı Üreticisi ve Modeli Seçimi](#adım-12-yazıcı-üreticisi-ve-modeli-seçimi)
+  - [Adım 13: Yazıcı Adı ve Paylaşım Ayarları](#adım-13-yazıcı-adı-ve-paylaşım-ayarları)
+  - [Adım 14: Kurulum Tamamlanması](#adım-14-kurulum-tamamlanması)
 - [Yazıcı Yönetimi](#-yazıcı-yönetimi)
 - [PowerShell ile Otomasyon](#-powershell-ile-otomasyon)
 - [Sık Karşılaşılan Sorunlar ve Çözümler](#-sık-karşılaşılan-sorunlar-ve-çözümler)
@@ -20,7 +34,7 @@ Bu rehber, Windows Server 2019/2022 sistemine Print and Document Services rolün
 
 ### Sistem Gereksinimleri
 
-- **İşletim Sistemi:** Windows Server 2019/2022 Standard/Datacenter
+- **İşletim Sistemi:** Windows Server 2019/2022/2025 Standard/Datacenter
 - **Bellek:** Minimum 2 GB (Önerilen 4+ GB)
 - **Depolama:** Minimum 10 GB boş alan
 - **Ağ:** Statik IP adresi ve yazıcı IP bilgisi
@@ -50,25 +64,17 @@ Get-WindowsUpdateLog
 
 ## 📦 Print and Document Services Kurulum Adımları
 
-### Adım 1: Server Manager Dashboard ve Role Seçimi
+### Adım 1: Server Manager'dan Role Ekleme
 
 **Server Manager** açıldığında **Dashboard** ekranından işlemlere başlanır.
-
-![Server Manager - Select Server Roles](Images/2.png)
-*Resim 2: Server Manager'da "Add Roles and Features Wizard" - Server Roles seçim ekranı. Print and Document Services ve DNS Server rollerinin seçildiği görülmekte.*
-
-**Kurulum Adımları:**
-
-1. **Server Manager** → **Dashboard** → **Add roles and features**
-2. **Before You Begin** ekranında **Next**
-3. **Installation Type** → **Role-based or feature-based installation** → **Next**
-4. **Server Selection** → Hedef sunucuyu seçin → **Next**
-5. **Server Roles** ekranında **Print and Document Services** işaretleyin
 
 **Teknik Detaylar:**
 - Server Core kurulumunda PowerShell veya sconfig kullanılır
 - GUI modunda Server Manager otomatik başlar
 - Rol bazlı kurulum için temel arayüz
+
+1. **Dashboard** üzerinden **Add Roles and Features Wizard** bağlantısına tıklayın
+2. **Server Roles** sekmesine gelindiğinde **Print and Document Services** seçeneğini işaretleyin
 
 **PowerShell Alternatifi:**
 
@@ -80,26 +86,27 @@ Install-WindowsFeature -Name Print-Services -IncludeManagementTools
 Get-WindowsFeature -Name Print-Services
 ```
 
+**📷 Referans:** `Images/1.png` - Server Manager Dashboard ve "Add Roles and Features Wizard" ekranı
+
 ---
 
 ### Adım 2: Gerekli Yönetim Araçlarının Eklenmesi
 
-Rol seçildikten sonra sistem otomatik olarak gerekli yönetim araçlarını kurmak için onay penceresi açar.
+Rol eklendikten sonra sistem otomatik olarak gerekli yönetim araçlarını kurmak için onay ister.
 
-![Add Features Dialog](Images/3.png)
-*Resim 3: "Add features that are required for Print and Document Services?" onay penceresi. Remote Server Administration Tools, Role Administration Tools ve Print and Document Services Tools bileşenleri listelenmekte.*
+**Add features that are required for Print and Document Services** penceresi açılır.
 
 **Yüklenen Bileşenler:**
 - **Remote Server Administration Tools:** Uzaktan yönetim araçları
 - **Role Administration Tools:** Rol yönetim araçları
-- **[Tools] Print and Document Services Tools:** Yazıcı yönetim konsolu
+- **Print and Document Services Tools:** Yazıcı yönetim konsolu
 
 **Teknik Özellikler:**
 - Print Management Console (printmanagement.msc)
 - Print PowerShell Module
 - RSAT araçları
 
-✅ **Include management tools (if applicable)** seçeneği işaretli olduğundan emin olun ve **Add Features** butonuna tıklayın.
+✅ **Include management tools (if applicable)** seçeneği işaretli olarak **Add Features** butonuna tıklayın.
 
 **PowerShell ile Yönetim Araçları Yükleme:**
 
@@ -114,27 +121,25 @@ Import-Module PrintManagement
 Get-Command -Module PrintManagement
 ```
 
+**📷 Referans:** `Images/2.png` - Management tools onay ekranı
+
 ---
 
-### Adım 3: Print and Document Services Bilgilendirme
+### Adım 3: Print and Document Services Yapılandırması
 
-**Print and Document Services** hakkında teknik bilgiler ve önemli notlar ekranı görüntülenir.
-
-![Print and Document Services Info](Images/4.png)
-*Resim 4: Print and Document Services bilgilendirme ekranı. Windows Server 2025 yazıcı sürücü desteği (Type 3 ve Type 4) ve güvenlik gereksinimleri açıklanmakta.*
+**Print and Document Services** yapılandırma ekranında önemli notlar yer alır.
 
 **Things to Note:**
 
 **📌 Windows Server 2025 Yazıcı Sürücüleri:**
-- Windows Server 2025, **Type 3** veya **Type 4** yazıcı sürücülerini destekler
-- Microsoft, **Type 4** yazıcı sürücülerinin kullanılmasını önerir
-- Type 4 sürücüler kullanıldığında, domain üyesi olmayan 32-bit istemciler yazıcıya bağlanabilir (32-bit sürücü olmadan)
+- Windows Server 2025, Type 3 veya Type 4 yazıcı sürücülerini destekler
+- Microsoft, Type 4 yazıcı sürücülerinin kullanılmasını önerir
+- Type 4 sürücüler kullanıldığında, domain üyesi olmayan 32-bit istemciler yazıcıya bağlanabilir
 
 **🔒 Güvenlik Gereksinimleri:**
-- İmzalı, **package aware** sürücüler kullanılmalıdır
-- İmzasız veya package aware olmayan sürücüler kullanılacaksa:
-  - İstemciler local administrator olmalı
-  - **VEYA** "Computer\Administrative Templates\Printers\Point and Print Restrictions" group policy ile yapılandırılmalıdır
+- İmzalı, paket tabanlı sürücüler kullanılmalıdır
+- İmzasız sürücüler kullanılacaksa GPO ile "Computer\Administrative Templates\Printers\Point and Print Restrictions" yapılandırılmalıdır
+- İstemciler yerel yönetici olmalı veya güvenlik politikası ayarlanmalıdır
 
 **📝 Type 3 vs Type 4 Sürücüler:**
 
@@ -146,25 +151,21 @@ Get-Command -Module PrintManagement
 | Kararlılık | Orta | Yüksek |
 | Windows 10/11 | Desteklenir | Önerilen |
 
-**Learn more about the Printer Server Role** linkine tıklayarak detaylı bilgi alınabilir.
+**Next** butonuna tıklanarak devam edilir.
 
-**Next** butonuna tıklayarak devam edilir.
+**📷 Referans:** `Images/3.png` - Print and Document Services bilgilendirme ekranı
 
 ---
 
 ### Adım 4: Role Services Seçimi
 
-**Select role services to install for Print and Document Services** ekranında yüklenecek servisler seçilir.
-
-![Select Role Services](Images/5.png)
-*Resim 5: Print and Document Services role services seçim ekranı. Print Server, Internet Printing ve LPD Service seçenekleri görülmekte.*
+**Select role services to install for Print and Document Services** ekranında aşağıdaki servisler seçilir:
 
 **Seçilen Role Services:**
 
 - ✅ **Print Server**
   - Line Printer Daemon (LPD) Service
   - Merkezi yazıcı yönetimi ve paylaşım servisi
-  - Temel print server fonksiyonları
 
 - ✅ **Internet Printing**
   - UNIX tabanlı bilgisayarlar için yazıcı servisi
@@ -174,11 +175,13 @@ Get-Command -Module PrintManagement
 - ✅ **LPD Service**
   - Line Printer Remote (LPR) servisi
   - UNIX/Linux sistemlerle uyumluluk
-  - TCP/IP üzerinden yazdırma
 
 **Otomatik Eklenen Bağımlılıklar:**
 
-**Web Server Role (IIS)** ve **Role Services** ekranında Web Server seçenekleri de otomatik eklenir.
+**Web Server Role (IIS)** otomatik olarak eklenir ve şu bileşenleri içerir:
+- IIS Web Server
+- ASP.NET 4.8
+- .NET Framework 4.8 Features
 
 **Servis Teknik Detayları:**
 
@@ -205,14 +208,13 @@ Get-WindowsFeature -Name Print-Internet
 
 **Next** butonuna tıklanarak devam edilir.
 
+**📷 Referans:** `Images/4.png` - Role Services seçim ekranı
+
 ---
 
 ### Adım 5: Kurulum Onayı
 
-**Confirm installation selections** ekranında kurulacak bileşenler listelenir.
-
-![Confirm Installation](Images/6.png)
-*Resim 6: Kurulum onay ekranı. .NET Framework 4.8, ASP.NET 4.8, Print and Document Services bileşenleri, Remote Server Administration Tools, ve Web Server (IIS) kurulacak öğeler listesinde.*
+**Confirm installation selections** ekranında kurulacak bileşenler listelenir:
 
 **Kurulum Bileşenleri:**
 
@@ -230,11 +232,11 @@ Remote Server Administration Tools
 └── Print and Document Services Tools
 
 Web Server (IIS)
-└── (Required components)
 ```
 
 **Kurulum Seçenekleri:**
 
+İsteğe bağlı olarak:
 - ☐ **Export configuration settings** - Yapılandırma ayarlarını XML olarak dışa aktarma
 - ☐ **Specify an alternate source path** - Alternatif kaynak yolu belirleme
 - ☐ **Restart the destination server automatically if required** - Otomatik yeniden başlatma
@@ -264,7 +266,7 @@ Get-EventLog -LogName System -Source "Service Control Manager" -Newest 20 | Wher
 
 **Install** butonuna tıklanarak kurulum başlatılır.
 
-Kurulum tamamlandıktan sonra **Close** butonu ile wizard kapatılır.
+**📷 Referans:** `Images/5.png` - Installation confirmation ekranı
 
 ---
 
@@ -274,16 +276,37 @@ Kurulum tamamlandıktan sonra **Close** butonu ile wizard kapatılır.
 
 Kurulum tamamlandıktan sonra **Windows Tools** menüsünden **Print Management** konsolu açılır.
 
-![Windows Tools - Print Management](Images/7.png)
-*Resim 7: Windows araması ile "Print Management" aranması ve sonuçlarda Print Management (System) uygulamasının görünümü. Ayrıca Windows Tools klasöründe diğer yönetim araçları da listelenmekte.*
-
 **Erişim Yolları:**
 
-1. **Start Menu → Search "Print Management"**
-2. **Start → Windows Tools → Print Management**
-3. **Start → Run → printmanagement.msc**
-4. **Server Manager → Tools → Print Management**
-5. **PowerShell:** `printmanagement.msc`
+1. **Start Menu → Windows Tools → Print Management**
+2. **Start → Run → printmanagement.msc**
+3. **Server Manager → Tools → Print Management**
+4. **PowerShell:** `& printmanagement.msc`
+
+**Konsol Yapısı:**
+
+```
+Print Management
+├── Custom Filters
+│   ├── All Printers
+│   ├── All Drivers
+│   ├── Printers Not Ready
+│   └── Printers With Jobs
+├── Print Servers
+│   └── DOMAIN (local)
+│       ├── Drivers
+│       ├── Forms
+│       ├── Ports
+│       └── Printers
+└── Deployed Printers
+```
+
+**Konsol Özellikleri:**
+
+- **Custom Filters:** Özel yazıcı filtreleri oluşturma
+- **Print Servers:** Merkezi yazıcı sunucuları yönetimi
+- **Deployed Printers:** GPO ile dağıtılan yazıcılar
+- **Forms:** Kağıt boyutları ve form tanımları
 
 **PowerShell Konsol Komutları:**
 
@@ -301,32 +324,13 @@ Get-Printer | Measure-Object | Select-Object Count
 Get-Printer | Select-Object Name, PrinterStatus, JobCount
 ```
 
+**📷 Referans:** `Images/7.png` - Windows Tools menüsü ve Print Management erişimi
+
 ---
 
-### Adım 7: Print Management Console Arayüzü
+### Adım 7: Mevcut Yazıcı Durumu
 
-Print Management konsolu açıldığında sol panelde yazıcı yönetim yapısı görüntülenir.
-
-![Print Management Console](Images/8.png)
-*Resim 8: Print Management konsolu ana ekranı. Sol panelde Custom Filters, All Printers, All Drivers, Print Servers yapısı, sağ panelde Microsoft Print to PDF yazıcısının detaylı bilgileri (Queue Status: Ready, Driver Version: 10.0.26100.4484, Driver Type: Type 4 - User Mode) gösterilmekte.*
-
-**Konsol Yapısı:**
-
-```
-Print Management
-├── Custom Filters
-│   ├── All Printers (1)
-│   ├── All Drivers (6)
-│   ├── Printers Not Ready
-│   └── Printers With Jobs
-├── Print Servers
-│   └── DOMAIN (local)
-│       ├── Drivers
-│       ├── Forms
-│       ├── Ports
-│       └── Printers
-└── Deployed Printers
-```
+Print Management konsolunda varsayılan olarak **Microsoft Print to PDF** yazıcısı görüntülenir.
 
 **Varsayılan Yazıcı Bilgileri:**
 
@@ -340,13 +344,6 @@ Print Management
 | **Driver Version** | 10.0.26100.4484 |
 | **Driver Type** | Type 4 - User Mode |
 
-**Konsol Özellikleri:**
-
-- **Custom Filters:** Özel yazıcı filtreleri oluşturma
-- **Print Servers:** Merkezi yazıcı sunucuları yönetimi
-- **Deployed Printers:** GPO ile dağıtılan yazıcılar
-- **Forms:** Kağıt boyutları ve form tanımları
-
 **Yazıcı Durumları:**
 
 | Status | Anlamı | Aksiyon |
@@ -356,20 +353,32 @@ Print Management
 | Paused | Duraklatılmış | Manuel müdahale |
 | Error | Hata | Troubleshooting gerekli |
 
+**PowerShell ile Yazıcı Sorguları:**
+
+```powershell
+# Tüm yazıcıları detaylı listeleme
+Get-Printer | Select-Object Name, DriverName, PortName, ShareName, Published, Shared
+
+# PDF yazıcı kontrolü
+Get-Printer -Name "Microsoft Print to PDF" | Format-List *
+
+# Yazıcı sürücü bilgisi
+Get-PrinterDriver | Select-Object Name, Manufacturer, PrinterEnvironment
+```
+
+**📷 Referans:** `Images/8.png` - Print Management konsolu ana ekranı
+
 ---
 
 ## 🌐 Ağ Yazıcısı Ekleme
 
-### Adım 8: Add Printer Wizard Başlatma
+### Adım 8: Network Printer Installation Wizard Başlatma
 
-Print Management konsolunda **Printers** klasörüne sağ tıklanır.
-
-![Add Printer Menu](Images/9.png)
-*Resim 9: Print Management konsolunda Printers klasörüne sağ tık menüsü. "Add Printer...", "Show Extended View", "Refresh", "Export List", "View", "Arrange Icons", "Help" seçenekleri görülmekte.*
+Print Management konsolunda **Printers** klasörüne sağ tıklanır ve **Add Printer...** seçeneği seçilir.
 
 **Sağ Tık Menü Seçenekleri:**
 
-- **Add Printer...** - Yeni yazıcı ekleme ✅
+- **Add Printer...** - Yeni yazıcı ekleme
 - **Show Extended View** - Genişletilmiş görünüm
 - **Refresh** - Listeyi yenileme
 - **Export List...** - Yazıcı listesi dışa aktarma
@@ -377,8 +386,6 @@ Print Management konsolunda **Printers** klasörüne sağ tıklanır.
 - **Arrange Icons** - İkon düzenleme
 - **Line up Icons** - İkonları hizalama
 - **Help** - Yardım menüsü
-
-**Add Printer...** seçeneğine tıklayın.
 
 **PowerShell ile Yazıcı Ekleme Alternatifi:**
 
@@ -393,14 +400,13 @@ Add-PrinterDriver -Name "Microsoft XPS Document Writer v4"
 Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v4" -PortName "IP_192.168.31.201"
 ```
 
+**📷 Referans:** `Images/9.png` - Sağ tık menüsü ve Add Printer seçeneği
+
 ---
 
 ### Adım 9: Yazıcı Kurulum Yöntemi Seçimi
 
-**Network Printer Installation Wizard** açılır ve kurulum yöntemi seçimi yapılır.
-
-![Printer Installation Method](Images/10.png)
-*Resim 10: "Network Printer Installation Wizard" - Printer Installation ekranı. Dört kurulum yöntemi listelenmekte: "Search the network for printers", "Add an IPP, TCP/IP, or Web Services Printer by IP address or hostname" (seçili), "Add a new printer using an existing port", "Create a new port and add a new printer".*
+**Printer Installation - Pick an installation method** ekranında aşağıdaki seçenekler sunulur:
 
 **Kurulum Yöntemleri:**
 
@@ -408,14 +414,14 @@ Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v
    - Ağ taraması ile otomatik yazıcı keşfi
    - WSD ve Bonjour protokolleri desteği
 
-2. 🔵 **Add an IPP, TCP/IP, or Web Services Printer by IP address or hostname** ✅
+2. 🔵 **Add an IPP, TCP/IP, or Web Services Printer by IP address or hostname**
    - Manuel IP adresi girişi (Önerilen)
    - IPP, RAW, LPR protokol desteği
    - DNS hostname veya IP kullanımı
 
 3. ⚪ **Add a new printer using an existing port**
    - Mevcut port üzerinden yazıcı ekleme
-   - LPT1: (Printer Port) seçeneği
+   - LPT1, COM1, FILE portları
 
 4. ⚪ **Create a new port and add a new printer**
    - Yeni port oluşturma (Local Port)
@@ -430,7 +436,7 @@ Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v
 | IPP | 631 | Orta | Modern sistemler |
 | WSD | - | Orta | Windows only |
 
-**🔵 Add an IPP, TCP/IP, or Web Services Printer** seçeneğini işaretleyin ve **Next** butonuna tıklayın.
+**🔵 Add an IPP, TCP/IP, or Web Services Printer** seçeneği işaretlenerek **Next** butonuna tıklanır.
 
 **PowerShell Port Yönetimi:**
 
@@ -445,21 +451,20 @@ Add-PrinterPort -Name "IP_192.168.31.201" -PrinterHostAddress "192.168.31.201"
 Add-PrinterPort -Name "LPR_192.168.31.201" -LprHostAddress "192.168.31.201" -LprQueue "PASSTHRU"
 ```
 
+**📷 Referans:** `Images/10.png` - Printer Installation yöntem seçimi
+
 ---
 
-### Adım 10: Yazıcı IP Adresi Yapılandırması
+### Adım 10: Yazıcı IP Adresi Girişi
 
-**Printer Address** ekranında yazıcının ağ bilgileri girilir.
-
-![Printer Address Configuration](Images/11.png)
-*Resim 11: Printer Address yapılandırma ekranı. Type of Device: "TCP/IP Device", Host name or IP address: "192.168.31.201", Port name: "192.168.31.201", "Auto detect the printer driver to use" checkbox'ı işaretli. Altta "Autodetect detects WSD and TCP/IP printers" bilgisi.*
+**Printer Address** ekranında yazıcı ağ bilgileri girilir.
 
 **Yapılandırma Parametreleri:**
 
 **Type of Device:** `TCP/IP Device`
 
 **Cihaz Türü Seçenekleri:**
-- **TCP/IP Device** - Standart ağ yazıcıları (RAW/LPR) ✅
+- **TCP/IP Device** - Standart ağ yazıcıları (RAW/LPR)
 - **Web Services Device** - WS-Print protokolü
 - **IPP Device** - Internet Printing Protocol
 
@@ -485,7 +490,7 @@ Add-PrinterPort -Name "LPR_192.168.31.201" -LprHostAddress "192.168.31.201" -Lpr
 - WSD (Web Services for Devices) yazıcıları algılar
 - TCP/IP (RAW port 9100) yazıcıları algılar
 - SNMP ile yazıcı model bilgisi alır
-- IPP yazıcı aramak için **Type of Device** dropdown'ından **IPP** seçilmelidir
+- IPP yazıcı aramak için **Type of Device** dropdown'ından IPP seçilmelidir
 
 **SNMP Ayarları:**
 
@@ -512,27 +517,26 @@ Test-NetConnection -ComputerName "192.168.31.201" -Port 161
 
 **Next** butonuna tıklanarak devam edilir.
 
+**📷 Referans:** `Images/11.png` - Printer Address girişi
+
 ---
 
 ### Adım 11: Yazıcı Sürücüsü Seçimi
 
-Autodetect çalıştıktan sonra **Printer Driver** seçim ekranı açılır.
-
-![Printer Driver Selection](Images/12.png)
-*Resim 12: Printer Driver seçim ekranı. Üç seçenek sunulmakta: "Use the printer driver that the wizard selected" (Compatible driver cannot be found.), "Use an existing printer driver on the computer" (Microsoft IPP Class Driver), "Install a new driver" (seçili).*
+**Printer Driver** ekranında üç seçenek sunulur:
 
 **Sürücü Seçim Yöntemleri:**
 
 1. ⚪ **Use the printer driver that the wizard selected**
    - Autodetect ile bulunan sürücü (Önerilen)
-   - *Compatible driver cannot be found.* - Bu örnekte algılanmadı
+   - *Compatible driver cannot be found.* - Eğer algılanmadıysa
 
 2. ⚪ **Use an existing printer driver on the computer**
    - Sistemde yüklü sürücüler kullanılır
    - Dropdown listeden seçim yapılır
    - Örnek: `Microsoft IPP Class Driver`
 
-3. 🔵 **Install a new driver** ✅
+3. 🔵 **Install a new driver**
    - Yeni sürücü kurulumu
    - Windows Update'ten veya disk'ten yükleme
    - Üretici sürücü dosyası ekleme
@@ -546,7 +550,7 @@ Autodetect çalıştıktan sonra **Printer Driver** seçim ekranı açılır.
 | PostScript Driver | PS dil desteği | Profesyonel baskı |
 | PCL Driver | HP Printer Language | HP ve uyumlu |
 
-**🔵 Install a new driver** seçeneğini işaretleyin ve **Next** butonuna tıklayın.
+**🔵 Install a new driver** seçeneği işaretlenerek **Next** butonuna tıklanır.
 
 **PowerShell ile Sürücü Yönetimi:**
 
@@ -561,20 +565,19 @@ Get-PrinterDriver -Name "Microsoft XPS Document Writer v4" | Format-List *
 Add-PrinterDriver -Name "HP LaserJet P3015" -InfPath "C:\Drivers\HP\hpbx3w81.inf"
 ```
 
+**📷 Referans:** `Images/12.png` - Printer Driver seçimi
+
 ---
 
-### Adım 12: Yazıcı Üreticisi ve Model Seçimi
+### Adım 12: Yazıcı Üreticisi ve Modeli Seçimi
 
-**Printer Installation** ekranında yazıcı üreticisi ve modeli seçilir.
-
-![Manufacturer and Model Selection](Images/13.png)
-*Resim 13: Printer Installation - "Select the manufacturer and model of your printer" ekranı. Sol tarafta Manufacturer listesi (Generic, Microsoft seçili), sağ tarafta Printers listesi (Microsoft MS-XPS Class Driver 2, Microsoft OpenXPS Class Driver, Microsoft OpenXPS Class Driver 2, Microsoft PCL6 Class Driver, Microsoft PS Class Driver). Alt kısımda "This driver is digitally signed" mesajı, Windows Update ve Have Disk butonları.*
+**Printer Installation - Select the manufacturer and model of your printer** ekranında sürücü seçilir.
 
 **Sürücü Seçim Ekranı:**
 
 **Manufacturer (Üretici) Listesi:**
 - Generic
-- 🔵 **Microsoft** ✅
+- 🔵 **Microsoft**
 - HP
 - Canon
 - Epson
@@ -633,14 +636,13 @@ Get-PrinterDriver | Where-Object {$_.Manufacturer -like "*Microsoft*"}
 
 **Next** butonuna tıklanarak devam edilir.
 
+**📷 Referans:** `Images/13.png` - Manufacturer ve model seçimi
+
 ---
 
 ### Adım 13: Yazıcı Adı ve Paylaşım Ayarları
 
-**Printer Name and Sharing Settings** ekranında yazıcı tanımlanır ve paylaşım yapılandırması yapılır.
-
-![Printer Name and Sharing Settings](Images/14.png)
-*Resim 14: Printer Name and Sharing Settings ekranı. Printer Name: "Microsoft MS-XPS Class Driver 2", "Share this printer" checkbox'ı işaretli, Share Name: "Microsoft MS-XPS Class Driver 2", Location ve Comment alanları boş.*
+**Printer Name and Sharing Settings** ekranında yazıcı tanımlanır.
 
 **Yazıcı Yapılandırma Parametreleri:**
 
@@ -717,14 +719,13 @@ Get-ADObject -Filter 'objectClass -eq "printQueue"' -SearchBase "CN=Printers,DC=
 
 **Next** butonuna tıklanarak kurulum tamamlanır.
 
+**📷 Referans:** `Images/14.png` - Printer Name and Sharing Settings
+
 ---
 
 ### Adım 14: Kurulum Tamamlanması
 
 **Completing the Network Printer Installation Wizard** ekranında kurulum sonucu görüntülenir.
-
-![Installation Complete](Images/1.png)
-*Resim 1: "Completing the Network Printer Installation Wizard" ekranı. Status kısmında "Driver installation succeeded." ve "Printer installation succeeded." başarı mesajları, "Your printer has been installed successfully." onay mesajı. Alt kısımda "Print test page" ve "Add another printer" checkbox seçenekleri, Finish butonu.*
 
 **Kurulum Durumu:**
 
@@ -748,7 +749,6 @@ Get-ADObject -Filter 'objectClass -eq "printQueue"' -SearchBase "CN=Printers,DC=
 - Yazıcı bağlantısı doğrulama
 - Renk/kalite kontrolü
 - Sorun giderme aracı
-- **Önerilir:** Test yazdırma için işaretleyin
 
 ☐ **Add another printer**
 - Hızlı çoklu yazıcı ekleme
@@ -767,11 +767,9 @@ Get-Printer -Name "Microsoft MS-XPS Class Driver 2" | Format-List *
 Test-Connection -ComputerName "192.168.31.201" -Count 2
 Get-Printer -Name "Microsoft MS-XPS Class Driver 2" | Select-Object Name, PrinterStatus, JobCount
 
-# Test sayfası yazdırma (PowerShell ile)
+# Test sayfası yazdırma
 $printer = Get-Printer -Name "Microsoft MS-XPS Class Driver 2"
-Invoke-Command -ScriptBlock {
-    $printer | Out-Printer
-}
+Start-Process -FilePath "rundll32.exe" -ArgumentList "printui.dll,PrintUIEntry /k /n ""$($printer.Name)"""
 
 # Print Management'ta görüntüleme
 Get-Printer | Where-Object {$_.ComputerName -eq $env:COMPUTERNAME}
@@ -784,40 +782,7 @@ Get-Printer | Where-Object {$_.ComputerName -eq $env:COMPUTERNAME}
 Get-EventLog -LogName System -Source "Print" -Newest 10
 
 # Microsoft-Windows-PrintService event log
-Get-WinEvent -LogName "Microsoft-Windows-PrintService/Admin" -MaxEvents 20 | 
-    Format-Table TimeCreated, Id, Message -AutoSize
-```
-
-**Test Sayfası Yazdırma:**
-
-```powershell
-# Manuel test sayfası yazdırma
-function Print-TestPage {
-    param([string]$PrinterName)
-    
-    $TestContent = @"
-========================================
-PRINT TEST PAGE
-========================================
-Printer: $PrinterName
-Date/Time: $(Get-Date)
-Server: $env:COMPUTERNAME
-User: $env:USERNAME
-========================================
-Test completed successfully!
-========================================
-"@
-    
-    $TestFile = "$env:TEMP\testpage_$(Get-Date -Format 'yyyyMMddHHmmss').txt"
-    $TestContent | Out-File -FilePath $TestFile -Encoding UTF8
-    
-    Start-Process -FilePath "notepad.exe" -ArgumentList "/p $TestFile" -Wait
-    Start-Sleep -Seconds 2
-    Remove-Item -Path $TestFile -Force -ErrorAction SilentlyContinue
-}
-
-# Kullanım
-Print-TestPage -PrinterName "Microsoft MS-XPS Class Driver 2"
+Get-WinEvent -LogName "Microsoft-Windows-PrintService/Admin" -MaxEvents 20
 ```
 
 ---
@@ -850,15 +815,9 @@ Get-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2"
 # Tüm işleri temizleme
 Get-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2" | Remove-PrintJob
 
-# Belirli bir işi duraklat
-Suspend-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2" -ID 1
-
-# İşi devam ettir
-Resume-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2" -ID 1
-
 # Yazıcıyı duraklatma/devam ettirme
-Set-Printer -Name "Microsoft MS-XPS Class Driver 2" -PrinterStatus Paused
-Set-Printer -Name "Microsoft MS-XPS Class Driver 2" -PrinterStatus Normal
+Suspend-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2"
+Resume-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2"
 ```
 
 ### Kullanıcı İzinleri
@@ -870,24 +829,17 @@ Set-Printer -Name "Microsoft MS-XPS Class Driver 2" -PrinterStatus Normal
 | **Print** | ✅ | ❌ | ❌ |
 | **Manage this printer** | ✅ | ✅ | ❌ |
 | **Manage documents** | ✅ | ❌ | ✅ |
-| **Full Control** | ✅ | ✅ | ✅ |
 
 **PowerShell İzin Yönetimi:**
 
 ```powershell
 # Domain Users'a print izni verme
-$printer = Get-Printer -Name "Microsoft MS-XPS Class Driver 2"
-$acl = Get-Acl -Path "Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Print\Printers\$($printer.Name)"
+$acl = Get-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 2"
+# ACL düzenleme ve uygulama
+Set-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 2" -SecurityDescriptor $acl
 
 # Grup bazlı izin ekleme
-$permission = "DOMAIN\IT-Team","FullControl","Allow"
-$accessRule = New-Object System.Security.AccessControl.RegistryAccessRule $permission
-$acl.SetAccessRule($accessRule)
-Set-Acl -Path "Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Print\Printers\$($printer.Name)" -AclObject $acl
-
-# Yazıcı güvenlik descriptorü ile izin yönetimi
-$sd = Get-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 2"
-# SDDL formatında düzenleme yapılabilir
+Add-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 2" -User "DOMAIN\IT-Team" -AccessRight ManagePrinter
 ```
 
 ### Yazdırma İşi İzleme
@@ -897,20 +849,11 @@ $sd = Get-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 
 ```powershell
 # Gerçek zamanlı izleme scripti
 while ($true) {
-    Clear-Host
     $jobs = Get-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2"
-    Write-Host "=== Print Job Monitor ===" -ForegroundColor Cyan
     Write-Host "Active Jobs: $($jobs.Count)" -ForegroundColor Green
-    Write-Host "Time: $(Get-Date)" -ForegroundColor Yellow
-    Write-Host ""
-    
-    if ($jobs.Count -gt 0) {
-        $jobs | Format-Table JobName, UserName, @{N='Size(KB)';E={[math]::Round($_.Size/1KB,2)}}, JobStatus, SubmittedTime -AutoSize
-    } else {
-        Write-Host "No active print jobs" -ForegroundColor Gray
-    }
-    
+    $jobs | Format-Table JobName, UserName, Size, JobStatus
     Start-Sleep -Seconds 5
+    Clear-Host
 }
 
 # Günlük yazdırma raporu
@@ -918,9 +861,9 @@ $StartDate = (Get-Date).AddDays(-1)
 Get-WinEvent -FilterHashtable @{
     LogName = 'Microsoft-Windows-PrintService/Operational'
     StartTime = $StartDate
-    ID = 307  # Print Job Completed event
-} | Select-Object TimeCreated, @{N='User';E={$_.Properties[3].Value}}, @{N='Document';E={$_.Properties[4].Value}}, @{N='Pages';E={$_.Properties[7].Value}} |
-Export-Csv -Path "C:\Reports\PrintLog_$(Get-Date -Format 'yyyyMMdd').csv" -NoTypeInformation
+} | Where-Object {$_.Id -eq 307} | 
+Select-Object TimeCreated, Message | 
+Export-Csv -Path "C:\PrintLog_$(Get-Date -Format 'yyyyMMdd').csv"
 ```
 
 ### Domain Üzerinden Dağıtım (Deploy)
@@ -928,30 +871,20 @@ Export-Csv -Path "C:\Reports\PrintLog_$(Get-Date -Format 'yyyyMMdd').csv" -NoTyp
 **Group Policy ile Yazıcı Dağıtımı:**
 
 ```powershell
-# Print Management konsolundan GPO ile dağıtım
-# GUI Adımları:
+# Print Management'tan GPO ile dağıtım
 # 1. Print Management Console'da yazıcıya sağ tık
 # 2. "Deploy with Group Policy..." seçeneğini seç
 # 3. GPO seç veya oluştur
 # 4. Per User veya Per Computer seç
-# 5. Add ve Apply
+# 5. Apply
 
 # PowerShell ile GPO printer deployment
-New-GPO -Name "Deployed Printers - Finance" -Comment "Finance department printers"
-
-# Yazıcıyı GPO'ya bağlama (requires Print Management module)
-$GPOName = "Deployed Printers - Finance"
-$PrinterPath = "\\DOMAIN\Microsoft MS-XPS Class Driver 2"
-
-# Registry bazlı deployment
-Set-GPRegistryValue -Name $GPOName `
-    -Key "HKCU\Software\Microsoft\Windows NT\CurrentVersion\PrinterPorts" `
-    -ValueName $PrinterPath `
-    -Type String `
-    -Value "winspool,Ne00:"
-
-# GPO'yu OU'ya bağlama
-New-GPLink -Name $GPOName -Target "OU=Finance,OU=Departments,DC=domain,DC=local" -LinkEnabled Yes
+$GPO = Get-GPO -Name "Printer Deployment Policy"
+Set-GPPrefRegistryValue -Name "Printer Deployment Policy" `
+    -Context User -Action Create `
+    -Key "HKCU\Printers\Connections" `
+    -ValueName "\\DOMAIN\Microsoft MS-XPS Class Driver 2" `
+    -Type String -Value ""
 ```
 
 **Deployment Script:**
@@ -966,64 +899,12 @@ $Printers = @(
 
 foreach ($Printer in $Printers) {
     try {
-        # Bağlantıyı ekle
-        (New-Object -ComObject WScript.Network).AddWindowsPrinterConnection($Printer)
-        Write-Host "✅ Eklendi: $Printer" -ForegroundColor Green
+        Add-Printer -ConnectionName $Printer
+        Write-Host "Eklendi: $Printer" -ForegroundColor Green
     }
     catch {
-        Write-Host "❌ Hata: $Printer - $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Hata: $Printer - $($_.Exception.Message)" -ForegroundColor Red
     }
-}
-
-# Varsayılan yazıcı ayarlama
-(New-Object -ComObject WScript.Network).SetDefaultPrinter("\\DOMAIN\Microsoft MS-XPS Class Driver 2")
-```
-
-**Login Script ile Otomatik Bağlama:**
-
-```powershell
-# Login script (\\domain\netlogon\printer-map.ps1)
-<#
-.SYNOPSIS
-    Kullanıcı login'de otomatik yazıcı bağlama
-.DESCRIPTION
-    Departman bazlı yazıcı mapping scripti
-#>
-
-# Kullanıcının departmanını al
-$UserDept = ([ADSISEARCHER]"samaccountname=$($env:USERNAME)").FindOne().Properties.department
-
-# Departman bazlı yazıcı mapping
-switch ($UserDept) {
-    "Finance" {
-        $Printers = @("\\DOMAIN\Finance-Printer", "\\DOMAIN\Microsoft MS-XPS Class Driver 2")
-        $DefaultPrinter = "\\DOMAIN\Finance-Printer"
-    }
-    "IT" {
-        $Printers = @("\\DOMAIN\IT-ColorPrinter", "\\DOMAIN\IT-BWPrinter")
-        $DefaultPrinter = "\\DOMAIN\IT-ColorPrinter"
-    }
-    default {
-        $Printers = @("\\DOMAIN\Microsoft MS-XPS Class Driver 2")
-        $DefaultPrinter = "\\DOMAIN\Microsoft MS-XPS Class Driver 2"
-    }
-}
-
-# Yazıcıları ekle
-$Network = New-Object -ComObject WScript.Network
-foreach ($Printer in $Printers) {
-    try {
-        $Network.AddWindowsPrinterConnection($Printer)
-    } catch {
-        # Sessizce devam et
-    }
-}
-
-# Varsayılan yazıcıyı ayarla
-try {
-    $Network.SetDefaultPrinter($DefaultPrinter)
-} catch {
-    # Sessizce devam et
 }
 ```
 
@@ -1041,319 +922,492 @@ try {
     Print Services rolünü kurar, yazıcı ekler ve yapılandırır
 .NOTES
     Yönetici yetkileri gereklidir
-.AUTHOR
-    Serif SELEN
-.VERSION
-    1.0
 #>
 
-# Elevation kontrolü
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "Bu script yönetici yetkileriyle çalıştırılmalıdır!"
-    Break
-}
-
 # Print Services rolünü kurma
-Write-Host "`n=== Print Services Rol Kurulumu ===" -ForegroundColor Cyan
-Write-Host "Print Services rolü kuruluyor..." -ForegroundColor Yellow
-
-$Features = @('Print-Services', 'Print-Internet', 'Print-LPD-Service')
-$InstallResult = Install-WindowsFeature -Name $Features -IncludeManagementTools -ErrorAction Stop
-
-if ($InstallResult.Success) {
-    Write-Host "✅ Print Services başarıyla kuruldu!" -ForegroundColor Green
-} else {
-    Write-Host "❌ Kurulum başarısız!" -ForegroundColor Red
-    exit 1
-}
+Write-Host "Print Services rolü kuruluyor..." -ForegroundColor Cyan
+Install-WindowsFeature -Name Print-Services,Print-Internet,Print-LPD-Service -IncludeManagementTools -Restart:$false
 
 # Print Management modülünü içe aktarma
-Import-Module PrintManagement -ErrorAction Stop
+Import-Module PrintManagement
 
-# Yazıcı yapılandırması
+# Yazıcı bilgileri
 $PrinterConfig = @{
-    Name = "Microsoft MS-XPS Class Driver 2"
+    Name = "Network-Printer-01"
     DriverName = "Microsoft XPS Document Writer v4"
     IPAddress = "192.168.31.201"
     PortName = "IP_192.168.31.201"
-    ShareName = "MS-XPS-NET"
-    Location = "Building A, Floor 2, Network Printer"
-    Comment = "Network XPS Printer - Centrally Managed"
+    ShareName = "NET-PRINT-01"
+    Location = "Building A, Floor 2"
+    Comment = "Network XPS Printer for Finance Department"
     Published = $true
 }
 
-Write-Host "`n=== Yazıcı Yapılandırması ===" -ForegroundColor Cyan
-
 # TCP/IP Port oluşturma
-Write-Host "Yazıcı portu oluşturuluyor: $($PrinterConfig.PortName)" -ForegroundColor Yellow
-try {
-    Add-PrinterPort -Name $PrinterConfig.PortName `
-        -PrinterHostAddress $PrinterConfig.IPAddress `
-        -PortNumber 9100 `
-        -SNMP $true `
-        -SNMPCommunity "public" `
-        -ErrorAction Stop
-    Write-Host "✅ Port oluşturuldu" -ForegroundColor Green
-} catch {
-    Write-Host "⚠️ Port zaten mevcut veya oluşturulamadı: $($_.Exception.Message)" -ForegroundColor Yellow
-}
+Write-Host "Yazıcı portu oluşturuluyor..." -ForegroundColor Cyan
+Add-PrinterPort -Name $PrinterConfig.PortName `
+    -PrinterHostAddress $PrinterConfig.IPAddress `
+    -PortNumber 9100 `
+    -SNMP $true `
+    -SNMPCommunity "public"
 
-# Sürücü kontrolü ve yükleme
-Write-Host "Yazıcı sürücüsü kontrol ediliyor..." -ForegroundColor Yellow
-$Driver = Get-PrinterDriver -Name $PrinterConfig.DriverName -ErrorAction SilentlyContinue
-
-if (-not $Driver) {
-    Write-Host "Sürücü yükleniyor: $($PrinterConfig.DriverName)" -ForegroundColor Yellow
-    try {
-        Add-PrinterDriver -Name $PrinterConfig.DriverName -ErrorAction Stop
-        Write-Host "✅ Sürücü yüklendi" -ForegroundColor Green
-    } catch {
-        Write-Host "❌ Sürücü yüklenemedi: $($_.Exception.Message)" -ForegroundColor Red
-        exit 1
-    }
-} else {
-    Write-Host "✅ Sürücü zaten mevcut" -ForegroundColor Green
-}
+# Sürücü yükleme
+Write-Host "Yazıcı sürücüsü yükleniyor..." -ForegroundColor Cyan
+Add-PrinterDriver -Name $PrinterConfig.DriverName
 
 # Yazıcı ekleme
-Write-Host "Yazıcı ekleniyor: $($PrinterConfig.Name)" -ForegroundColor Yellow
-try {
-    Add-Printer -Name $PrinterConfig.Name `
-        -DriverName $PrinterConfig.DriverName `
-        -PortName $PrinterConfig.PortName `
-        -Shared $true `
-        -ShareName $PrinterConfig.ShareName `
-        -Location $PrinterConfig.Location `
-        -Comment $PrinterConfig.Comment `
-        -Published $PrinterConfig.Published `
-        -ErrorAction Stop
-    
-    Write-Host "✅ Yazıcı başarıyla eklendi!" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Yazıcı eklenemedi: $($_.Exception.Message)" -ForegroundColor Red
-    exit 1
-}
+Write-Host "Yazıcı ekleniyor..." -ForegroundColor Cyan
+Add-Printer -Name $PrinterConfig.Name `
+    -DriverName $PrinterConfig.DriverName `
+    -PortName $PrinterConfig.PortName `
+    -Shared $true `
+    -ShareName $PrinterConfig.ShareName `
+    -Location $PrinterConfig.Location `
+    -Comment $PrinterConfig.Comment `
+    -Published $PrinterConfig.Published
 
-# Yazıcı durumunu kontrol etme ve raporlama
-Write-Host "`n=== Kurulum Raporu ===" -ForegroundColor Cyan
-$Printer = Get-Printer -Name $PrinterConfig.Name -ErrorAction SilentlyContinue
-
+# Yazıcı durumunu kontrol etme
+$Printer = Get-Printer -Name $PrinterConfig.Name
 if ($Printer) {
-    Write-Host "Yazıcı Bilgileri:" -ForegroundColor White
-    $Printer | Format-List Name, DriverName, PortName, Shared, ShareName, Published, PrinterStatus | Out-String | Write-Host
-    
-    # UNC yolunu göster
-    $UNCPath = "\\$env:COMPUTERNAME\$($Printer.ShareName)"
-    Write-Host "UNC Yolu: $UNCPath" -ForegroundColor Green
-    
-    # Bağlantı testi
-    Write-Host "`nYazıcı bağlantısı test ediliyor..." -ForegroundColor Yellow
-    $TestConn = Test-NetConnection -ComputerName $PrinterConfig.IPAddress -Port 9100 -InformationLevel Quiet
-    if ($TestConn) {
-        Write-Host "✅ Yazıcıya bağlantı başarılı (Port 9100)" -ForegroundColor Green
-    } else {
-        Write-Host "⚠️ Yazıcıya bağlantı kurulamadı!" -ForegroundColor Yellow
-    }
+    Write-Host "✅ Yazıcı başarıyla eklendi!" -ForegroundColor Green
+    $Printer | Format-List Name, DriverName, PortName, Shared, Published
 } else {
-    Write-Host "❌ Yazıcı bulunamadı!" -ForegroundColor Red
+    Write-Host "❌ Yazıcı eklenirken hata oluştu!" -ForegroundColor Red
 }
+
+# Test sayfası yazdırma fonksiyonu
+function Print-TestPage {
+    param([string]$PrinterName)
+    
+    $TestFile = "$env:TEMP\testpage.txt"
+    "Print Test - $(Get-Date)" | Out-File -FilePath $TestFile
+    Start-Process -FilePath "notepad.exe" -ArgumentList "/p $TestFile" -Wait
+    Remove-Item -Path $TestFile -Force
+}
+
+# İsteğe bağlı test sayfası
+# Print-TestPage -PrinterName $PrinterConfig.Name
 
 Write-Host "`n✅ Kurulum tamamlandı!" -ForegroundColor Green
-Write-Host "`nYazıcı yönetimi için: printmanagement.msc" -ForegroundColor Cyan
 ```
 
-### Toplu Yazıcı Ekleme (CSV'den)
+### Toplu Yazıcı Ekleme
 
 ```powershell
-<#
-.SYNOPSIS
-    CSV dosyasından toplu yazıcı kurulumu
-.DESCRIPTION
-    CSV formatındaki yazıcı listesini okuyarak toplu kurulum yapar
-#>
+# CSV'den toplu yazıcı kurulumu
+$Printers = Import-Csv -Path "C:\Printers.csv"
 
 # CSV Format:
-# Name,IPAddress,DriverName,Location,Department,ShareName,Comment
-
-$CSVPath = "C:\Scripts\Printers.csv"
-
-# Örnek CSV içeriği oluşturma
-$SampleCSV = @"
-Name,IPAddress,DriverName,Location,Department,ShareName,Comment
-Finance-Printer,192.168.31.202,Microsoft XPS Document Writer v4,Building A - Floor 3,Finance,FIN-PRINT,Finance Department Printer
-HR-Printer,192.168.31.203,Microsoft XPS Document Writer v4,Building B - Floor 1,HR,HR-PRINT,HR Department Printer
-IT-ColorPrinter,192.168.31.204,Microsoft XPS Document Writer v4,Building A - Floor 1,IT,IT-COLOR,IT Color Printer
-"@
-
-# Örnek CSV'yi oluştur (ilk çalıştırmada)
-if (-not (Test-Path $CSVPath)) {
-    $SampleCSV | Out-File -FilePath $CSVPath -Encoding UTF8
-    Write-Host "Örnek CSV dosyası oluşturuldu: $CSVPath" -ForegroundColor Yellow
-    Write-Host "Lütfen dosyayı düzenleyin ve scripti tekrar çalıştırın." -ForegroundColor Yellow
-    exit
-}
-
-# CSV'den yazıcı listesini oku
-$Printers = Import-Csv -Path $CSVPath
-
-Write-Host "=== Toplu Yazıcı Kurulumu ===" -ForegroundColor Cyan
-Write-Host "Toplam $($Printers.Count) yazıcı kurulacak`n" -ForegroundColor Yellow
+# Name,IPAddress,DriverName,Location,Department,ShareName
 
 foreach ($Printer in $Printers) {
-    Write-Host "İşleniyor: $($Printer.Name)" -ForegroundColor White
-    
     $PortName = "IP_$($Printer.IPAddress)"
     
     # Port oluştur
-    try {
-        Add-PrinterPort -Name $PortName -PrinterHostAddress $Printer.IPAddress -ErrorAction Stop
-        Write-Host "  ✅ Port oluşturuldu: $PortName" -ForegroundColor Green
-    } catch {
-        Write-Host "  ⚠️ Port zaten mevcut: $PortName" -ForegroundColor Yellow
-    }
+    Add-PrinterPort -Name $PortName -PrinterHostAddress $Printer.IPAddress -ErrorAction SilentlyContinue
     
     # Yazıcı ekle
-    try {
-        Add-Printer -Name $Printer.Name `
-            -DriverName $Printer.DriverName `
-            -PortName $PortName `
-            -Shared $true `
-            -ShareName $Printer.ShareName `
-            -Location $Printer.Location `
-            -Comment $Printer.Comment `
-            -ErrorAction Stop
-        
-        Write-Host "  ✅ $($Printer.Name) eklendi`n" -ForegroundColor Green
-    } catch {
-        Write-Host "  ❌ Hata: $($_.Exception.Message)`n" -ForegroundColor Red
-    }
+    Add-Printer -Name $Printer.Name `
+        -DriverName $Printer.DriverName `
+        -PortName $PortName `
+        -Shared $true `
+        -ShareName $Printer.ShareName `
+        -Location $Printer.Location `
+        -Comment "$($Printer.Department) Department Printer"
+    
+    Write-Host "✅ $($Printer.Name) eklendi" -ForegroundColor Green
 }
-
-Write-Host "`n✅ Toplu kurulum tamamlandı!" -ForegroundColor Green
-
-# Özet rapor
-$InstalledPrinters = Get-Printer | Where-Object {$_.Name -in $Printers.Name}
-Write-Host "`nKurulu Yazıcı Sayısı: $($InstalledPrinters.Count)" -ForegroundColor Cyan
-$InstalledPrinters | Format-Table Name, DriverName, PortName, Shared -AutoSize
 ```
 
-### Yazıcı Sağlık Kontrolü ve Monitoring
+### Yazıcı Sağlık Kontrolü
 
 ```powershell
-<#
-.SYNOPSIS
-    Yazıcı sağlık kontrolü ve durum raporu
-.DESCRIPTION
-    Tüm yazıcılar için detaylı sağlık kontrolü yapar
-#>
-
+# Tüm yazıcılar için sağlık kontrolü
 function Test-PrinterHealth {
-    [CmdletBinding()]
-    param()
-    
-    Write-Host "=== Yazıcı Sağlık Kontrolü ===" -ForegroundColor Cyan
-    Write-Host "Tarih: $(Get-Date)`n" -ForegroundColor Yellow
-    
     $Printers = Get-Printer
     $Report = @()
     
     foreach ($Printer in $Printers) {
-        Write-Host "Kontrol ediliyor: $($Printer.Name)" -ForegroundColor White
-        
-        $Status = [PSCustomObject]@{
+        $Status = @{
             Name = $Printer.Name
             Status = $Printer.PrinterStatus
-            JobCount = 0
+            JobCount = (Get-PrintJob -PrinterName $Printer.Name).Count
             Shared = $Printer.Shared
             Published = $Printer.Published
-            DriverVersion = ""
-            Connectivity = "N/A"
-            LastError = "None"
-        }
-        
-        # İş sayısı
-        try {
-            $Jobs = Get-PrintJob -PrinterName $Printer.Name -ErrorAction Stop
-            $Status.JobCount = $Jobs.Count
-        } catch {
-            $Status.LastError = "Cannot get job count"
-        }
-        
-        # Sürücü versiyonu
-        try {
-            $Driver = Get-PrinterDriver -Name $Printer.DriverName -ErrorAction Stop
-            $Status.DriverVersion = $Driver.DriverVersion
-        } catch {
-            $Status.DriverVersion = "Unknown"
         }
         
         # Port connectivity testi
         if ($Printer.PortName -match "IP_(.+)") {
             $IP = $Matches[1]
-            Write-Host "  Bağlantı test ediliyor: $IP" -ForegroundColor Gray
-            $TestResult = Test-NetConnection -ComputerName $IP -Port 9100 -InformationLevel Quiet -WarningAction SilentlyContinue
-            $Status.Connectivity = if ($TestResult) { "✅ Online" } else { "❌ Offline" }
+            $Status.Connectivity = (Test-NetConnection -ComputerName $IP -Port 9100 -InformationLevel Quiet)
         }
         
-        $Report += $Status
-        Write-Host "  Durum: $($Status.Status) | Bağlantı: $($Status.Connectivity)`n" -ForegroundColor $(if ($Status.Status -eq 'Normal') { 'Green' } else { 'Yellow' })
+        $Report += New-Object PSObject -Property $Status
     }
     
-    # Özet rapor
-    Write-Host "`n=== Özet Rapor ===" -ForegroundColor Cyan
-    $Report | Format-Table Name, Status, JobCount, Connectivity, Shared, Published -AutoSize
-    
-    # CSV'ye kaydet
-    $ReportPath = "C:\Reports\PrinterHealth_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
-    $ReportDir = Split-Path -Path $ReportPath -Parent
-    if (-not (Test-Path $ReportDir)) {
-        New-Item -Path $ReportDir -ItemType Directory -Force | Out-Null
-    }
-    $Report | Export-Csv -Path $ReportPath -NoTypeInformation
-    Write-Host "`n✅ Rapor kaydedildi: $ReportPath" -ForegroundColor Green
-    
-    return $Report
+    return $Report | Format-Table -AutoSize
 }
 
+# Raporu çalıştırma
+Test-PrinterHealth
+```
 
+### Yazıcı Yedekleme ve Geri Yükleme
 
 ```powershell
-<#
-.SYNOPSIS
-    Yazıcı yapılandırması yedekleme ve geri yükleme
-.DESCRIPTION
-    Tüm yazıcı, port ve sürücü yapılandırmalarını yedekler
-#>
-
+# Yazıcı yapılandırmasını yedekleme
 function Backup-PrinterConfiguration {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$false)]
-        [string]$BackupPath = "C:\PrinterBackup"
-    )
+    param([string]$BackupPath = "C:\PrinterBackup")
     
-    Write-Host "=== Yazıcı Yapılandırması Yedekleme ===" -ForegroundColor Cyan
-    
-    # Yedek klasörü oluştur
-    $BackupFolder = Join-Path -Path $BackupPath -ChildPath (Get-Date -Format 'yyyyMMdd_HHmmss')
-    if (-not (Test-Path $BackupFolder)) {
-        New-Item -Path $BackupFolder -ItemType Directory -Force | Out-Null
+    if (-not (Test-Path $BackupPath)) {
+        New-Item -Path $BackupPath -ItemType Directory | Out-Null
     }
     
-    Write-Host "Yedekleme konumu: $BackupFolder`n" -ForegroundColor Yellow
-    
     # Yazıcıları dışa aktarma
-    Write-Host "Yazıcılar yedekleniyor..." -ForegroundColor White
-    $Printers = Get-Printer
-    $Printers | Export-Clixml -Path (Join-Path -Path $BackupFolder -ChildPath "Printers.xml")
-    Write-Host "  ✅ $($Printers.Count) yazıcı yedeklendi" -ForegroundColor Green
+    Get-Printer | Export-Clixml -Path "$BackupPath\Printers_$(Get-Date -Format 'yyyyMMdd').xml"
     
     # Portları dışa aktarma
-    Write-Host "Portlar yedekleniyor..." -ForegroundColor White
-    $Ports = Get-PrinterPort
-    $Ports | Export-Clixml -Path (Join-Path -Path $BackupFolder -ChildPath "PrinterPorts.xml")
-    Write-Host "  ✅ $($Ports.Count) port yedeklendi" -
+    Get-PrinterPort | Export-Clixml -Path "$BackupPath\PrinterPorts_$(Get-Date -Format 'yyyyMMdd').xml"
+    
+    # Sürücüleri dışa aktarma
+    Get-PrinterDriver | Export-Clixml -Path "$BackupPath\PrinterDrivers_$(Get-Date -Format 'yyyyMMdd').xml"
+    
+    Write-Host "✅ Yedekleme tamamlandı: $BackupPath" -ForegroundColor Green
+}
+
+# Yazıcı yapılandırmasını geri yükleme
+function Restore-PrinterConfiguration {
+    param([string]$BackupPath)
+    
+    # Portları içe aktarma
+    $Ports = Import-Clixml -Path "$BackupPath\PrinterPorts_*.xml" | Select-Object -First 1
+    foreach ($Port in $Ports) {
+        Add-PrinterPort -Name $Port.Name -PrinterHostAddress $Port.PrinterHostAddress -ErrorAction SilentlyContinue
+    }
+    
+    # Sürücüleri içe aktarma
+    $Drivers = Import-Clixml -Path "$BackupPath\PrinterDrivers_*.xml" | Select-Object -First 1
+    foreach ($Driver in $Drivers) {
+        Add-PrinterDriver -Name $Driver.Name -ErrorAction SilentlyContinue
+    }
+    
+    # Yazıcıları içe aktarma
+    $Printers = Import-Clixml -Path "$BackupPath\Printers_*.xml" | Select-Object -First 1
+    foreach ($Printer in $Printers) {
+        Add-Printer -Name $Printer.Name `
+            -DriverName $Printer.DriverName `
+            -PortName $Printer.PortName `
+            -Shared $Printer.Shared `
+            -ShareName $Printer.ShareName `
+            -ErrorAction SilentlyContinue
+    }
+    
+    Write-Host "✅ Geri yükleme tamamlandı!" -ForegroundColor Green
+}
+
+# Yedekleme çalıştırma
+Backup-PrinterConfiguration -BackupPath "C:\PrinterBackup"
 ```
+
+---
+
+## 🔧 Sık Karşılaşılan Sorunlar ve Çözümler
+
+### Sorun 1: Yazıcı Offline Görünüyor
+
+**Belirtiler:**
+- Yazıcı durumu "Offline" olarak görünüyor
+- Yazdırma işleri kuyrukta bekliyor
+- Ping atılıyor ancak yazıcı çalışmıyor
+
+**Çözüm:**
+
+```powershell
+# Yazıcı durumunu kontrol et
+Get-Printer -Name "Microsoft MS-XPS Class Driver 2" | Select-Object Name, PrinterStatus, DriverName
+
+# Print Spooler servisini yeniden başlat
+Restart-Service Spooler
+
+# Port bağlantısını test et
+Test-NetConnection -ComputerName "192.168.31.201" -Port 9100
+
+# SNMP servisini kontrol et
+Get-Service -Name SNMP | Restart-Service
+
+# Yazıcıyı online hale getir
+Set-Printer -Name "Microsoft MS-XPS Class Driver 2" -PrinterStatus Normal
+```
+
+**Alternatif Çözüm:**
+1. Print Management Console → Yazıcıya sağ tık
+2. **Use Printer Online** seçeneğini işaretle
+3. Print Spooler servisini yeniden başlat
+
+---
+
+### Sorun 2: Sürücü Kurulum Hatası
+
+**Belirtiler:**
+- "Driver installation failed"
+- "The specified driver is not compatible"
+- Dijital imza hatası
+
+**Çözüm:**
+
+```powershell
+# Mevcut sürücüleri listele
+Get-PrinterDriver | Select-Object Name, PrinterEnvironment
+
+# Eski sürücüyü kaldır
+Remove-PrinterDriver -Name "Microsoft MS-XPS Class Driver 2" -RemoveFromDriverStore
+
+# Print Spooler'ı temizle
+Stop-Service Spooler
+Remove-Item -Path "C:\Windows\System32\spool\PRINTERS\*" -Force -ErrorAction SilentlyContinue
+Start-Service Spooler
+
+# Yeni sürücü yükle
+Add-PrinterDriver -Name "Microsoft XPS Document Writer v4"
+
+# Driver signing policy kontrolü (Test ortamları için)
+# bcdedit /set testsigning on
+# bcdedit /set nointegritychecks on
+```
+
+---
+
+### Sorun 3: Paylaşım Erişim Sorunu
+
+**Belirtiler:**
+- İstemciler yazıcıya erişemiyor
+- "Access Denied" hatası
+- UNC yolu çalışmıyor
+
+**Çözüm:**
+
+```powershell
+# Paylaşım kontrolü
+Get-Printer -Name "Microsoft MS-XPS Class Driver 2" | Select-Object Shared, ShareName
+
+# SMB paylaşım ayarlarını kontrol et
+Get-SmbShare
+
+# Güvenlik duvarı kuralları
+New-NetFirewallRule -DisplayName "File and Printer Sharing (SMB-In)" `
+    -Direction Inbound -Protocol TCP -LocalPort 445 -Action Allow
+
+New-NetFirewallRule -DisplayName "Print Spooler Service (RPC)" `
+    -Direction Inbound -Protocol TCP -LocalPort 135 -Action Allow
+
+# Print Spooler güvenlik ayarları
+Set-Service -Name Spooler -StartupType Automatic
+sc.exe sdset Spooler "D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)"
+
+# Yazıcı paylaşım izinlerini sıfırla
+$acl = Get-PrinterSecurityDescriptor -PrinterName "Microsoft MS-XPS Class Driver 2"
+# ACL'yi düzenle ve uygula
+```
+
+---
+
+### Sorun 4: Print Queue Takılması
+
+**Belirtiler:**
+- Yazdırma işleri silinemiyor
+- Spooler servisi sürekli durıyor
+- Yazıcı kuyruk temizlenemiyor
+
+**Çözüm:**
+
+```powershell
+# Agresif kuyruk temizleme scripti
+function Clear-PrintQueue {
+    param([string]$PrinterName)
+    
+    # Tüm işleri durdur
+    Get-PrintJob -PrinterName $PrinterName | Remove-PrintJob -Confirm:$false
+    
+    # Spooler'ı durdur
+    Stop-Service -Name Spooler -Force
+    
+    # Spool klasörünü temizle
+    Remove-Item -Path "C:\Windows\System32\spool\PRINTERS\*" -Force -ErrorAction SilentlyContinue
+    
+    # Spooler'ı başlat
+    Start-Service -Name Spooler
+    
+    # Yazıcıyı yeniden başlat
+    Disable-Printer -Name $PrinterName
+    Start-Sleep -Seconds 2
+    Enable-Printer -Name $PrinterName
+    
+    Write-Host "✅ Print queue temizlendi" -ForegroundColor Green
+}
+
+# Kullanım
+Clear-PrintQueue -PrinterName "Microsoft MS-XPS Class Driver 2"
+```
+
+---
+
+### Sorun 5: DNS/NetBIOS İsim Çözümleme Sorunu
+
+**Belirtiler:**
+- `\\SERVERNAME\PrinterName` çalışmıyor
+- IP ile erişim çalışıyor
+- Client yazıcı bulamıyor
+
+**Çözüm:**
+
+```powershell
+# DNS kaydını kontrol et
+Resolve-DnsName -Name $env:COMPUTERNAME
+
+# NetBIOS kontrolü
+nbtstat -a $env:COMPUTERNAME
+
+# WINS kaydını yenile
+nbtstat -RR
+
+# Hosts dosyasına ekleme (geçici çözüm)
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "192.168.31.100  DOMAIN"
+
+# DNS Client cache temizleme
+Clear-DnsClientCache
+
+# NetBIOS over TCP/IP kontrolü
+Get-NetAdapterBinding | Where-Object {$_.DisplayName -like "*NetBIOS*"}
+```
+
+---
+
+## 📚 En İyi Uygulamalar
+
+### Güvenlik
+
+**1. Yazıcı Güvenliği:**
+
+```powershell
+# Güvenli yazıcı yapılandırması
+Set-Printer -Name "Microsoft MS-XPS Class Driver 2" -PermissionSDDL "O:BAG:DUD:(A;;SWRC;;;BA)(A;;SW;;;WD)"
+
+# Anonymous kullanıcıların erişimini engelle
+Set-PrinterPermission -PrinterName "Microsoft MS-XPS Class Driver 2" -UserName "Everyone" -AccessRight None
+
+# Denetim etkinleştirme
+auditpol /set /subcategory:"Print Service" /success:enable /failure:enable
+```
+
+**2. Departman Bazlı İzinler:**
+
+```powershell
+# Finance departmanına özel izin
+Set-PrinterPermission -PrinterName "Finance-Printer" -UserName "DOMAIN\Finance-Users" -AccessRight Print
+
+# IT departmanına tam yönetim
+Set-PrinterPermission -PrinterName "Finance-Printer" -UserName "DOMAIN\IT-Admins" -AccessRight ManagePrinter
+```
+
+### Performans Optimizasyonu
+
+**1. Print Spooler Ayarları:**
+
+```powershell
+# Spooler thread sayısını artırma
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Print" -Name "ServerThread" -Value 4
+
+# Spooler timeout süresini ayarlama
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Print" -Name "SpoolerTimeOut" -Value 600
+```
+
+**2. Spool Klasörü Optimizasyonu:**
+
+```powershell
+# Spool klasörünü farklı diske taşıma
+$NewSpoolPath = "D:\PrintSpool"
+New-Item -Path $NewSpoolPath -ItemType Directory -Force
+
+Stop-Service Spooler
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Print\Printers" `
+    -Name "DefaultSpoolDirectory" -Value $NewSpoolPath
+Start-Service Spooler
+```
+
+### Monitoring ve Raporlama
+
+**1. Otomatik Sağlık Kontrolü:**
+
+```powershell
+# Scheduled Task ile otomatik monitoring
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" `
+    -Argument "-File C:\Scripts\PrinterHealthCheck.ps1"
+
+$Trigger = New-ScheduledTaskTrigger -Daily -At "08:00AM"
+
+Register-ScheduledTask -TaskName "Printer Health Check" `
+    -Action $Action -Trigger $Trigger -RunLevel Highest
+```
+
+**2. Günlük Yazdırma Raporu:**
+
+```powershell
+# Günlük yazdırma istatistikleri
+$Report = Get-WinEvent -FilterHashtable @{
+    LogName = 'Microsoft-Windows-PrintService/Operational'
+    StartTime = (Get-Date).AddDays(-1)
+    ID = 307
+} | Group-Object {$_.Properties[2].Value} | 
+Select-Object @{N='Printer';E={$_.Name}}, @{N='JobCount';E={$_.Count}}
+
+$Report | Export-Csv -Path "C:\Reports\DailyPrintReport_$(Get-Date -Format 'yyyyMMdd').csv"
+```
+
+### Yedekleme Stratejisi
+
+**1. Düzenli Otomatik Yedekleme:**
+
+```powershell
+# Haftalık yedekleme task
+$BackupScript = {
+    $BackupPath = "\\FileServer\PrinterBackups\$(Get-Date -Format 'yyyyMMdd')"
+    New-Item -Path $BackupPath -ItemType Directory -Force
+    
+    Get-Printer | Export-Clixml -Path "$BackupPath\Printers.xml"
+    Get-PrinterPort | Export-Clixml -Path "$BackupPath\Ports.xml"
+    Get-PrinterDriver | Export-Clixml -Path "$BackupPath\Drivers.xml"
+    
+    # Registry backup
+    reg export "HKLM\SYSTEM\CurrentControlSet\Control\Print" "$BackupPath\PrintRegistry.reg" /y
+}
+
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" `
+    -Argument "-Command $BackupScript"
+
+$Trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Sunday -At "02:00AM"
+
+Register-ScheduledTask -TaskName "Weekly Printer Backup" `
+    -Action $Action -Trigger $Trigger -RunLevel Highest
+```
+
+### Dokümantasyon
+
+**1. Yazıcı Envanteri:**
+
+```powershell
+# Detaylı yazıcı envanteri raporu
+Get-Printer | Select-Object Name, DriverName, PortName, Location, Comment, Shared, Published |
+Export-Csv -Path "C:\Reports\PrinterInventory_$(Get-Date -Format 'yyyyMMdd').csv" -NoTypeInformation
+
+# HTML rapor oluşturma
+$HTML = Get-Printer | ConvertTo-Html -Property Name, DriverName, PortName, PrinterStatus, JobCount `
+    -Title "Printer Inventory Report" -PreContent "<h1>Printer Inventory - $(Get-Date)</h1>"
+
+$HTML | Out-File -FilePath "C:\Reports\PrinterInventory.html"
+```
+
+---
+
 ## 📄 Doküman Bilgileri
 
 | Özellik | Değer |
