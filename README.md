@@ -1,330 +1,239 @@
-# 🖥️ Windows Server 2025 Üzerinde AD DS ve DNS Kurulumu
+# 🖨️ Windows Server 2025 Üzerinde Print and Document Services Kurulumu ve Yazıcı Ekleme
 
-> ⚠️ **Not:** Bu rehber, **Windows Server 2025 Standard Evaluation** sürümüne göre hazırlanmıştır. Üretim ortamlarında lisanslı bir sürüm kullanılmalıdır.
-
-Bu rehber, Windows Server 2025 sistemine **Active Directory Domain Services (AD DS)** ve **DNS Server** rollerinin nasıl kurulacağını adım adım açıklar. Kurulum, `Server Manager` aracılığıyla gerçekleştirilir.
+> ⚠️ **Not:** Bu rehber, **Windows Server 2025 Standard Evaluation** sürümüne göre hazırlanmıştır. Üretim ortamlarında lisanslı sürüm kullanılmalıdır.
 
 ---
 
 ## 📑 İçindekiler
-
-- [Gereksinimler](#-gereksinimler)
-- [Adım 1: Server Manager Ana Ekranı](#-adım-1-server-manager-ana-ekranı)
-- [Adım 2: “Add Roles and Features Wizard” Başlatma](#-adım-2-add-roles-and-features-wizard-başlatma)
-- [Adım 3: Kurulum Türü Seçimi](#-adım-3-kurulum-türü-seçimi)
-- [Adım 4: Hedef Sunucu Seçimi](#-adım-4-hedef-sunucu-seçimi)
-- [Adım 5: Active Directory Domain Services Rolü Seçimi](#-adım-5-active-directory-domain-services-rolü-seçimi)
-- [Adım 6: Deployment Configuration – Yeni Orman Oluşturma](#-adım-6-deployment-configuration--yeni-orman-oluşturma)
-- [Adım 7: Domain Controller Seçenekleri](#-adım-7-domain-controller-seçenekleri)
-- [Adım 8: Ön Koşul Denetimi](#-adım-8-ön-koşul-denetimi)
-- [Adım 9: Kurulum İlerleme Durumu](#-adım-9-kurulum-ilerleme-durumu)
-- [Adım 10: Post-deployment Yapılandırma Uyarısı](#-adım-10-post-deployment-yapılandırma-uyarısı)
-- [Adım 11: AD DS Yapılandırması Tamamlandı](#-adım-11-ad-ds-yapılandırması-tamamlandı)
-- [Adım 12: DNS Sunucusu Kontrolü](#-adım-12-dns-sunucusu-kontrolü)
-- [Adım 13: Etki Alanı Kullanıcıları ve Grupları](#-adım-13-etki-alanı-kullanıcıları-ve-grupları)
-- [Adım 14: Güvenlik ve En İyi Uygulamalar](#-adım-14-güvenlik-ve-en-iyi-uygulamalar)
-- [✅ Kurulum Sonrası Öneriler](#-kurulum-sonrası-öneriler)
-- [📚 Doküman Bilgileri](#-doküman-bilgileri)
+- [Adım 1: Server Manager üzerinden "Add Roles and Features" Sihirbazı](#-adım-1-server-manager-üzerinden-add-roles-and-features-sihirbazı)
+- [Adım 2: Print and Document Services Rolünün Seçilmesi](#-adım-2-print-and-document-services-rolünün-seçilmesi)
+- [Adım 3: Rol Hizmetlerinin (Role Services) Seçilmesi](#-adım-3-rol-hizmetlerinin-role-services-seçilmesi)
+- [Adım 4: Kurulum Öncesi Bilgilendirme Ekranı](#-adım-4-kurulum-öncesi-bilgilendirme-ekranı)
+- [Adım 5: Kurulum Onayı ve Yönetim Araçlarının Dahil Edilmesi](#-adım-5-kurulum-onayı-ve-yönetim-araçlarının-dahil-edilmesi)
+- [Adım 6: Print Management Aracına Erişim](#-adım-6-print-management-aracına-erişim)
+- [Adım 7: Add Printer Menüsü](#-adım-7-add-printer-menüsü)
+- [Adım 8: Ağ Yazıcısı Türünün Seçilmesi](#-adım-8-ağ-yazıcısı-türünün-seçilmesi)
+- [Adım 9: Yazıcı IP Adresinin Girilmesi](#-adım-9-yazıcı-ip-adresinin-girilmesi)
+- [Adım 10: Sürücü Seçimi](#-adım-10-sürücü-seçimi)
+- [Adım 11: Sürücü Yükleme Yöntemi](#-adım-11-sürücü-yükleme-yöntemi)
+- [Adım 12: Yazıcı Adı ve Paylaşım Ayarları](#-adım-12-yazıcı-adı-ve-paylaşım-ayarları)
+- [Adım 13: Kurulum Tamamlama](#-adım-13-kurulum-tamamlama)
+- [Adım 14: Print Management'te Yazıcının Görünümü](#-adım-14-print-managementte-yazıcının-görünümü)
 
 ---
 
-## 🛠️ Gereksinimler
-
-- Windows Server 2025 Standard Evaluation (veya lisanslı sürüm)
-- Statik IP adresi yapılandırılmış sunucu (`192.168.31.100`)
-- Güçlü bir yönetici şifresi
-- Güncel sistem yamaları
-- Internet bağlantısı (Windows Update için önerilir)
-
----
-
-## 🚀 Adım 1: Server Manager Ana Ekranı
+## 🚀 Adım 1: Server Manager üzerinden "Add Roles and Features" Sihirbazı
 
 ![1.png](Images/1.png)
 
 **Açıklama:**  
-Server Manager açıldığında sol üst köşede **“QUICK START”** bölümü görünür. Burada:
-- **Configure this local server**
-- **Add roles and features**
-- **Add other servers to manage**
+Server Manager ana ekranında:
+- **QUICK START** bölümü görünür
+- **Add roles and features** bağlantısı seçilmelidir
 
-seçenekleri yer alır.
+✅ AD DS kurulumuna başlamak için **"Add roles and features"** bağlantısına tıklayın.
 
-✅ AD DS kurulumuna başlamak için  
-**“Add roles and features”** bağlantısına tıklayın.
-
-> 💡 **Pro Tip:** Server Manager, tüm Windows Server rollerinin ve özelliklerinin yönetildiği merkezi araçtır. Başlangıçta her zaman bu pencereden başlayın.
+> 💡 **Pro Tip:** Server Manager, tüm Windows Server rollerinin ve özelliklerinin yönetildiği merkezi araçtır.
 
 ---
 
-## 🧩 Adım 2: “Add Roles and Features Wizard” Başlatma
+## 🧩 Adım 2: Print and Document Services Rolünün Seçilmesi
 
 ![2.png](Images/2.png)
 
 **Açıklama:**  
-**Before You Begin** ekranında, kurulum öncesi ön koşullar özetlenir:
-- Güçlü bir yönetici şifresi
-- Statik IP yapılandırması
-- Güncel sistem yamaları
+**Server Roles** ekranında:
+- Sol panelde roller listesi görünür
+- **Print and Document Services** rolü seçilir
+- Açılan **"Add features required"** penceresinde **Add Features** butonuna tıklanır
 
-Bu sayfa yalnızca bilgilendiricidir.  
-➡️ **Next** butonuna tıklayarak devam edin.
+✅ **Print and Document Services** rolünü seçtikten sonra **Next** butonuna tıklayın.
 
 ---
 
-## 📄 Adım 3: Kurulum Türü Seçimi
+## 📄 Adım 3: Rol Hizmetlerinin (Role Services) Seçilmesi
 
 ![3.png](Images/3.png)
 
 **Açıklama:**  
-**Installation Type** ekranında iki seçenek sunulur:
-- ✅ **Role-based or feature-based installation** → Roller veya özellikler eklemek için
-- ❌ Remote Desktop Services installation → Uzak masaüstü hizmetleri için
+**Role Services** seçim ekranında:
+- **Print Server** (temel servis)
+- **LPD Service** (Linux/Unix desteği)
+- **Internet Printing** (web üzerinden yazdırma)
+- **Fax Server** (opsiyonel)
 
-✅ **“Role-based or feature-based installation”** seçeneğini işaretleyin.  
-➡️ **Next** butonuna tıklayın.
+✅ Gerekli tüm hizmetleri seçtikten sonra **Next** butonuna tıklayın.
 
 ---
 
-## 🔍 Adım 4: Hedef Sunucu Seçimi
+## ⚠️ Adım 4: Kurulum Öncesi Bilgilendirme Ekranı
 
 ![4.png](Images/4.png)
 
 **Açıklama:**  
-**Server Selection** ekranında:
-- **Name**: `DOMAIN`
-- **IP Address**: `192.168.31.100`
-- **Operating System**: `Windows Server 2025 Standard Evaluation`
+**Things to Note** ekranında:
+- Type 3 ve Type 4 sürücü farkları
+- 32-bit istemci desteği
+- Güvenlik ve performans önerileri
 
-gibi bilgiler görüntülenir.
-
-✅ Kurulum yapılacak sunucu zaten seçili gelir. Doğru sunucuyu seçtiğinizden emin olduktan sonra  
-➡️ **Next** butonuna tıklayın.
+✅ Bu ekran sadece bilgilendirme amaçlıdır. **Next** butonuna tıklayarak devam edin.
 
 ---
 
-## 📦 Adım 5: Active Directory Domain Services Rolü Seçimi
+## ✅ Adım 5: Kurulum Onayı ve Yönetim Araçlarının Dahil Edilmesi
 
 ![5.png](Images/5.png)
 
 **Açıklama:**  
-**Server Roles** listesinden **“Active Directory Domain Services”** kutusunu işaretleyin.
-
-Sistem, bu rol için gerekli yönetim araçlarını önerir:
-- Group Policy Management
-- AD DS and AD LDS Tools
-- Active Directory Administrative Center
-- AD DS Snap-Ins and Command-Line Tools
-
-✅ **“Include management tools (if applicable)”** seçeneği otomatik işaretlenir.  
-➡️ **Add Features** butonuna tıklayıp **Next** butonuna geçin.
-
----
-
-## 🌲 Adım 6: Deployment Configuration – Yeni Orman Oluşturma
-
-![6.png](Images/6.png)
-
-**Açıklama:**  
-AD DS kurulumu tamamlandıktan sonra **“Promote this server to a domain controller”** bağlantısıyla açılan sihirbazda:
-
-- ☑ **Add a new forest** seçeneği işaretlenir
-- **Root domain name**: `serifselen.local` girilir
-
-⚠️ Eğer **“Verification of forest name failed”** uyarısı alırsanız:
-- Etki alanı adını basitleştirin (`ad.local` gibi)
-- DNS sunucusu ayarlarını kontrol edin
-
-➡️ **Next** butonuna tıklayın.
-
-> ⚠️ **Önemli Uyarı:** `.local` uzantılı domain adları yalnızca **test ortamları** için uygundur. Üretimde **kaydedilmiş bir domain** (örn: `corp.serifselen.com`) kullanılmalıdır.
-
----
-
-## 🎯 Adım 7: Domain Controller Seçenekleri
-
-![7.png](Images/7.png)
-
-**Açıklama:**  
-**Domain Controller Options** ekranında:
-
-- **Forest functional level**: `Windows Server 2025`
-- **Domain functional level**: `Windows Server 2025`
-- ☑ **DNS server** → Otomatik olarak yüklenir
-- ☑ **Global Catalog (GC)** → Varsayılan olarak seçilir
-- **DSRM password**: Güçlü bir şifre girilir (Directory Services Restore Mode)
-
-DSRM şifresi, acil durum kurtarma modu için gereklidir. Şifreyi güvenli bir yere kaydedin.
-
-➡️ **Next** butonuna tıklayın.
-
----
-
-## ✅ Adım 8: Ön Koşul Denetimi
-
-![8.png](Images/8.png)
-
-**Açıklama:**  
-**Prerequisites Check** ekranında:
-
-- ✅ **All prerequisite checks passed successfully** uyarıları görüntülenir.
-
-⚠️ **“A delegation for this DNS server cannot be created…”** uyarısı, mevcut bir DNS altyapısı yoksa **ihmal edilebilir**.
+**Confirm installation selections** ekranında:
+- **"Include management tools"** seçeneği işaretli olmalıdır
+- Yüklenecek bileşenler listelenir:
+  - Print and Document Services
+  - .NET Framework 4.8
+  - Yönetim araçları
 
 ➡️ **Install** butonuna tıklayarak kurulumu başlatın.
 
 ---
 
-## 🔄 Adım 9: Kurulum İlerleme Durumu
+## 🔍 Adım 6: Print Management Aracına Erişim
+
+![6.png](Images/6.png)
+
+**Açıklama:**  
+Kurulum tamamlandıktan sonra:
+- **Start Menu** üzerinden **Print Management** aranır
+- Alternatif: `Win + R` > `printmanagement.msc`
+
+✅ Araç başarıyla açıldığında sol panelde:
+- Print Servers
+- All Drivers
+- Forms
+- Ports
+- Printers
+
+bölümleri görüntülenir.
+
+---
+
+## ➕ Adım 7: Add Printer Menüsü
+
+![7.png](Images/7.png)
+
+**Açıklama:**  
+Print Management ekranında:
+- Sol panelde **Printers** bölümüne sağ tıklayın
+- Açılan menüde **Add Printer...** seçeneği seçilir
+
+✅ Bu işlem, yeni yazıcı ekleme sihirbazını başlatır.
+
+---
+
+## 🌐 Adım 8: Ağ Yazıcısı Türünün Seçilmesi
+
+![8.png](Images/8.png)
+
+**Açıklama:**  
+**Network Printer Installation Wizard** ekranında:
+- **Add a printer using a TCP/IP address or hostname** seçeneği seçilir
+- Diğer seçenekler:
+  - Search the network for printers
+  - Add a local printer
+  - Add a printer using an existing port
+
+✅ **Next** butonuna tıklayarak devam edin.
+
+---
+
+## 📍 Adım 9: Yazıcı IP Adresinin Girilmesi
 
 ![9.png](Images/9.png)
 
 **Açıklama:**  
-**Installation progress** ekranında yüklenen bileşenler listelenir:
-- Active Directory Domain Services
-- Group Policy Management
-- Remote Server Administration Tools
-- AD DS Tools
-- Active Directory PowerShell modülleri
+**Add Printer** ekranında:
+- **Hostname or IP address**: `192.168.31.201` (yazıcının IP'si)
+- **Port Name**: `IP_192.168.31.201` (otomatik oluşturulur)
+- **Auto detect printer driver** seçeneği işaretli
 
-Kurulum tamamlandığında sunucu **otomatik olarak yeniden başlatılır**.
+✅ Yazıcı IP'nizi doğru girdiğinizden emin olun. **Next** butonuna tıklayın.
 
 ---
 
-## ⚠️ Adım 10: Post-deployment Yapılandırma Uyarısı
+## 🖨️ Adım 10: Sürücü Seçimi
 
 ![10.png](Images/10.png)
 
 **Açıklama:**  
-Sunucu yeniden başladığında `Server Manager` dashboard’unda sağ üst köşede bir uyarı simgesi belirir:
+**Install the printer driver** ekranında:
+- **Manufacturer**: `Microsoft`
+- **Printers**: `Microsoft MS-XPS Class Driver 2`
+- Bu, sanal XPS yazıcı sürücüsüdür (test amaçlı)
 
-> **Post-deployment Configuration**  
-> Configuration required for Active Directory Domain Services at DOMAIN  
-> **Promote this server to a domain controller**
-
-✅ Bu uyarı, AD DS yapılandırmasının tamamlanmadığını gösterir.
-
-➡️ **Bağlantıya tıklayarak yapılandırmayı tamamlayabilirsiniz.**
-
-> ❌ **Yanlış Bilgi Düzeltmesi:**  
-> “komut satırından `dcpromo` ile devam edebilirsiniz” ifadesi **yanlıştır**.  
-> `dcpromo` komutu **Windows Server 2012’den sonra kaldırılmıştır**.  
->  
-> ✅ **Doğrusu:**  
-> PowerShell ile `Install-ADDSDomainController` komutunu kullanın veya sihirbaz üzerinden devam edin.
+✅ Gerçek yazıcı için üreticinin sitesinden indirdiğiniz sürücüyü seçin. **Next** butonuna tıklayın.
 
 ---
 
-## ✅ Adım 11: AD DS Yapılandırması Tamamlandı
+## 🛠️ Adım 11: Sürücü Yükleme Yöntemi
 
 ![11.png](Images/11.png)
 
 **Açıklama:**  
-Yapılandırma tamamlandığında, aşağıdaki mesaj görüntülenir:
+Sistem sürücüyü bulamadığında:
+- **Install a new driver** seçeneği seçilir
+- **Have Disk** butonu ile özel sürücü yüklenebilir
 
-> **The configuration of Active Directory Domain Services completed successfully.**
-
-Sunucu artık **serifselen.local** etki alanında bir **Domain Controller (Etki Alanı Denetleyicisi)** olarak çalışmaktadır.
-
-➡️ **Close** butonuna tıklayarak sihirbazı kapatın.
-
-> 💡 **Pro Tip:** Bu ekranda “Restart the destination server automatically if required” seçeneği işaretliyse, sunucu otomatik olarak yeniden başlar.
+✅ Gerçek yazıcılar için **Have Disk** ile üreticiden indirdiğiniz `.inf` dosyasını seçin.
 
 ---
 
-## 🌐 Adım 12: DNS Sunucusu Kontrolü
+## 🏷️ Adım 12: Yazıcı Adı ve Paylaşım Ayarları
 
 ![12.png](Images/12.png)
 
 **Açıklama:**  
-DNS sunucusu, AD DS kurulumu sırasında otomatik olarak yüklenir. Kontrol etmek için:
+**Printer name and sharing settings** ekranında:
+- **Printer name**: `Microsoft MS-XPS Class Driver 2`
+- **Share this printer**: ✅ İşaretli (ağda paylaşılacaksa)
+- **Share name**: `XPS_PRINTER`
+- **Location**: `Server Room`
+- **Comment**: `Test yazıcı - sanal`
 
-1. `Server Manager` > `Tools` > `DNS`
-2. Sol panelde `DOMAIN` > `Forward Lookup Zones` > `serifselen.local` açılır.
-3. Burada `@` (root) record ve `_msdcs` alt alanı görülmelidir.
-
-✅ DNS records otomatik oluşturulmuşsa, yapılandırma başarılı demektir.
-
-> ⚠️ **Uyarı:** DNS record’ların eksik olması, etki alanına katılım sorunlarına neden olur.
+✅ Paylaşım ayarlarını doğru yapılandırdıktan sonra **Next** butonuna tıklayın.
 
 ---
 
-## 👥 Adım 13: Etki Alanı Kullanıcıları ve Grupları
+## ✅ Adım 13: Kurulum Tamamlama
 
 ![13.png](Images/13.png)
 
 **Açıklama:**  
-AD DS kurulumu tamamlandıktan sonra ilk kullanıcıları oluşturmak gerekir.
+**Completing the Network Printer Installation Wizard** ekranında:
+- **Print test page** seçeneği işaretlenebilir
+- Kurulum tamamlandıktan sonra **Finish** butonuna tıklanır
 
-1. `Server Manager` > `Tools` > `Active Directory Users and Computers`
-2. `serifselen.local` altında:
-   - `Users` klasörüne sağ tıkla > `New` > `User`
-   - Örnek: `ITAdmin`, `HelpDesk`, `GuestUser`
-
-✅ **Önerilen Gruplar:**
-- `Domain Admins`: Sistem yönetimi
-- `Enterprise Admins`: Çoklu etki alanı yönetimi
-- `Schema Admins`: Şema değişiklikleri
-
-> 💡 **En İyi Uygulama:** Her kullanıcıyı en az yetki seviyesindeki gruba ekleyin (Principle of Least Privilege).
+✅ Test sayfası basarak yazıcının çalıştığını doğrulayın.
 
 ---
 
-## 🔒 Adım 14: Güvenlik ve En İyi Uygulamalar
+## 📊 Adım 14: Print Management'te Yazıcının Görünümü
 
 ![14.png](Images/14.png)
 
 **Açıklama:**  
-AD DS kurulumu tamamlandıktan sonra güvenlik önlemlerini uygulayın:
+Print Management ekranında:
+- Yeni eklenen yazıcı **Printers** bölümünde listelenir
+- **Status**: `Ready`
+- **Jobs in Queue**: `0`
+- **Driver**: `Microsoft MS-XPS Class Driver 2`
 
-### ✅ 1. Güvenlik Duvarı Ayarları
-- TCP 53 (DNS)
-- TCP 88 (Kerberos)
-- TCP 389 (LDAP)
-- TCP 445 (SMB)
-- TCP 3268 (Global Catalog)
-
-### ✅ 2. Grup İlkesi (GPO) Yapılandırması
-- `Default Domain Policy`’yi düzenleyin:
-  - Şifre karmaşıklığı
-  - Oturum açma deneme limiti
-  - Güvenlik logları
-
-### ✅ 3. Yedekleme Planı
-- **System State** yedeklemesi alın.
-- Windows Server Backup veya üçüncü parti araçlar (Veeam, Altaro) kullanın.
-
-### ✅ 4. Güvenlik İzolasyonu
-- DC’yi ayrı bir ağ segmentine yerleştirin.
-- Güvenlik duvarı ile erişimi sınırlayın.
+✅ Yazıcı başarıyla eklenmiş ve kullanıma hazırdır.
 
 ---
 
-## ✅ Kurulum Sonrası Öneriler
+## ✅ Sonuç
+- Print and Document Services rolü başarıyla kuruldu
+- Ağ yazıcısı sisteme entegre edildi
+- Yazıcı paylaşılarak ağ kullanıcılarına açıldı
+- Test sayfası başarıyla basıldı
 
-- **Diğer Sunucuları Etki Alanına Katma:**  
-  ```powershell
-  Add-Computer -DomainName "serifselen.local" -Restart
-  ```
-
-- **İstemci Makineleri Etki Alanına Katma:**  
-  - `Settings` > `Accounts` > `Access Work or School` > `Connect` > `Join this device to a local Active Directory domain`
-
-- **Azure AD Connect Entegrasyonu:**  
-  - Bulut ile şirket içi AD arasında senkronizasyon sağlar.
-
----
-
-## 📚 Doküman Bilgileri
-
-| Özellik | Değer |
-|---|---|
-| **Yazar** | Serif SELEN |
-| **Tarih** | 2 Kasım 2025 |
-| **Platform** | VMware Workstation Pro 17 |
-| **İşletim Sistemi** | Windows Server 2025 Standard Evaluation |
-| **Etki Alanı Adı** | `serifselen.local` |
-| **DNS** | Otomatik olarak kurulmuştur |
-| **Lisans** | Evaluation (180 gün) |
-
-> 📝 **Bu doküman eğitim ve test ortamları için hazırlanmıştır. Üretimde lisanslı yazılım ve güvenlik önlemleri kullanılmalıdır.**
+> 📝 **Bu doküman, eğitim ve test ortamları için hazırlanmıştır. Üretimde lisanslı yazılım ve güvenlik önlemleri kullanılmalıdır.**
