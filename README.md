@@ -1,6 +1,6 @@
 # 🖨️ Windows Server Print and Document Services Kurulumu
 
-Bu rehber, Windows Server 2019/2022/2025 sistemine Print and Document Services rolünün nasıl kurulacağını ve ağ yazıcısı ekleme işlemlerini adım adım açıklar. Kurulum, Server Manager aracılığıyla gerçekleştirilir.
+Bu rehber, Windows Server 2019/2022 sistemine Print and Document Services rolünün nasıl kurulacağını ve ağ yazıcısı ekleme işlemlerini adım adım açıklar. Kurulum, Server Manager aracılığıyla gerçekleştirilir.
 
 ## 📋 İçindekiler
 
@@ -34,7 +34,7 @@ Bu rehber, Windows Server 2019/2022/2025 sistemine Print and Document Services r
 
 ### Sistem Gereksinimleri
 
-- **İşletim Sistemi:** Windows Server 2019/2022/2025 Standard/Datacenter
+- **İşletim Sistemi:** Windows Server 2019/2022 Standard/Datacenter
 - **Bellek:** Minimum 2 GB (Önerilen 4+ GB)
 - **Depolama:** Minimum 10 GB boş alan
 - **Ağ:** Statik IP adresi ve yazıcı IP bilgisi
@@ -86,7 +86,10 @@ Install-WindowsFeature -Name Print-Services -IncludeManagementTools
 Get-WindowsFeature -Name Print-Services
 ```
 
-**📷 Referans:** `Images/1.png` - Server Manager Dashboard ve "Add Roles and Features Wizard" ekranı
+**📷 Referans Görsel:**
+
+![Server Manager - Add Roles and Features](Images/2.png)
+*Resim: Server Manager Dashboard'da Print and Document Services rolü seçimi ekranı*
 
 ---
 
@@ -121,7 +124,10 @@ Import-Module PrintManagement
 Get-Command -Module PrintManagement
 ```
 
-**📷 Referans:** `Images/2.png` - Management tools onay ekranı
+**📷 Referans Görsel:**
+
+![Add Features Dialog](Images/3.png)
+*Resim: Print and Document Services için gerekli yönetim araçlarının eklenmesi*
 
 ---
 
@@ -153,7 +159,10 @@ Get-Command -Module PrintManagement
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `Images/3.png` - Print and Document Services bilgilendirme ekranı
+**📷 Referans Görsel:**
+
+![Print and Document Services Configuration](Images/4.png)
+*Resim: Print and Document Services yapılandırma ekranı - Yazıcı sürücü türleri ve güvenlik notları*
 
 ---
 
@@ -208,7 +217,10 @@ Get-WindowsFeature -Name Print-Internet
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `Images/4.png` - Role Services seçim ekranı
+**📷 Referans Görsel:**
+
+![Select Role Services](Images/5.png)
+*Resim: Print Server, Internet Printing ve LPD Service seçimi ekranı*
 
 ---
 
@@ -266,7 +278,10 @@ Get-EventLog -LogName System -Source "Service Control Manager" -Newest 20 | Wher
 
 **Install** butonuna tıklanarak kurulum başlatılır.
 
-**📷 Referans:** `Images/5.png` - Installation confirmation ekranı
+**📷 Referans Görsel:**
+
+![Confirm Installation](Images/6.png)
+*Resim: Kurulum onay ekranı - Yüklenecek bileşenlerin listesi*
 
 ---
 
@@ -324,7 +339,10 @@ Get-Printer | Measure-Object | Select-Object Count
 Get-Printer | Select-Object Name, PrinterStatus, JobCount
 ```
 
-**📷 Referans:** `Images/7.png` - Windows Tools menüsü ve Print Management erişimi
+**📷 Referans Görsel:**
+
+![Windows Tools - Print Management](Images/7.png)
+*Resim: Windows Tools menüsünden Print Management konsoluna erişim*
 
 ---
 
@@ -366,7 +384,10 @@ Get-Printer -Name "Microsoft Print to PDF" | Format-List *
 Get-PrinterDriver | Select-Object Name, Manufacturer, PrinterEnvironment
 ```
 
-**📷 Referans:** `Images/8.png` - Print Management konsolu ana ekranı
+**📷 Referans Görsel:**
+
+![Print Management Console](Images/8.png)
+*Resim: Print Management konsolu ana ekranı - Varsayılan Microsoft Print to PDF yazıcısı*
 
 ---
 
@@ -400,7 +421,10 @@ Add-PrinterDriver -Name "Microsoft XPS Document Writer v4"
 Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v4" -PortName "IP_192.168.31.201"
 ```
 
-**📷 Referans:** `Images/9.png` - Sağ tık menüsü ve Add Printer seçeneği
+**📷 Referans Görsel:**
+
+![Add Printer Menu](Images/9.png)
+*Resim: Printers klasörü sağ tık menüsü - Add Printer seçeneği*
 
 ---
 
@@ -451,7 +475,10 @@ Add-PrinterPort -Name "IP_192.168.31.201" -PrinterHostAddress "192.168.31.201"
 Add-PrinterPort -Name "LPR_192.168.31.201" -LprHostAddress "192.168.31.201" -LprQueue "PASSTHRU"
 ```
 
-**📷 Referans:** `Images/10.png` - Printer Installation yöntem seçimi
+**📷 Referans Görsel:**
+
+![Printer Installation Method](Images/10.png)
+*Resim: Yazıcı kurulum yöntemi seçimi - TCP/IP yazıcı ekleme*
 
 ---
 
@@ -517,7 +544,7 @@ Test-NetConnection -ComputerName "192.168.31.201" -Port 161
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `Images/11.png` - Printer Address girişi
+**📷 Referans:** `11.png` - Printer Address girişi
 
 ---
 
@@ -565,7 +592,7 @@ Get-PrinterDriver -Name "Microsoft XPS Document Writer v4" | Format-List *
 Add-PrinterDriver -Name "HP LaserJet P3015" -InfPath "C:\Drivers\HP\hpbx3w81.inf"
 ```
 
-**📷 Referans:** `Images/12.png` - Printer Driver seçimi
+**📷 Referans:** `12.png` - Printer Driver seçimi
 
 ---
 
@@ -636,7 +663,7 @@ Get-PrinterDriver | Where-Object {$_.Manufacturer -like "*Microsoft*"}
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `Images/13.png` - Manufacturer ve model seçimi
+**📷 Referans:** `13.png` - Manufacturer ve model seçimi
 
 ---
 
@@ -719,7 +746,7 @@ Get-ADObject -Filter 'objectClass -eq "printQueue"' -SearchBase "CN=Printers,DC=
 
 **Next** butonuna tıklanarak kurulum tamamlanır.
 
-**📷 Referans:** `Images/14.png` - Printer Name and Sharing Settings
+**📷 Referans:** `14.png` - Printer Name and Sharing Settings
 
 ---
 
@@ -784,6 +811,8 @@ Get-EventLog -LogName System -Source "Print" -Newest 10
 # Microsoft-Windows-PrintService event log
 Get-WinEvent -LogName "Microsoft-Windows-PrintService/Admin" -MaxEvents 20
 ```
+
+**📷 Referans:** `1.png` - Completing the Network Printer Installation Wizard
 
 ---
 
@@ -1416,7 +1445,7 @@ $HTML | Out-File -FilePath "C:\Reports\PrinterInventory.html"
 | **Tarih** | 4 Kasım 2025 |
 | **Versiyon** | 1.0 |
 | **Platform** | VMware Workstation Pro 17 |
-| **İşletim Sistemi** | Windows Server 2019/2022/2025 |
+| **İşletim Sistemi** | Windows Server 2019/2022 |
 | **Yazıcı Model** | Generic Network Printer |
 | **Yazıcı IP** | 192.168.31.201 |
 | **Lisans** | Evaluation |
@@ -1443,6 +1472,4 @@ $HTML | Out-File -FilePath "C:\Reports\PrinterInventory.html"
 
 🔗 **GitHub Repository:** [https://github.com/serifselen/Print-and-Document-Services-Kurulumu](https://github.com/serifselen)
 
----
-
-**Not:** Bu doküman, Windows Server 2019, 2022 ve 2025 sürümleri için geçerlidir. Önceki Windows Server sürümlerinde bazı adımlar farklılık gösterebilir.
+###
