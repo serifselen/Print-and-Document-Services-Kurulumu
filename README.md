@@ -86,7 +86,7 @@ Install-WindowsFeature -Name Print-Services -IncludeManagementTools
 Get-WindowsFeature -Name Print-Services
 ```
 
-**📷 Referans:** `1.png` - Server Manager Dashboard ve "Add Roles and Features Wizard" ekranı
+**📷 Referans:** `Images/1.png` - Server Manager Dashboard ve "Add Roles and Features Wizard" ekranı
 
 ---
 
@@ -121,7 +121,7 @@ Import-Module PrintManagement
 Get-Command -Module PrintManagement
 ```
 
-**📷 Referans:** `2.png` - Management tools onay ekranı
+**📷 Referans:** `Images/2.png` - Management tools onay ekranı
 
 ---
 
@@ -153,7 +153,7 @@ Get-Command -Module PrintManagement
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `3.png` - Print and Document Services bilgilendirme ekranı
+**📷 Referans:** `Images/3.png` - Print and Document Services bilgilendirme ekranı
 
 ---
 
@@ -208,7 +208,7 @@ Get-WindowsFeature -Name Print-Internet
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `4.png` - Role Services seçim ekranı
+**📷 Referans:** `Images/4.png` - Role Services seçim ekranı
 
 ---
 
@@ -266,7 +266,7 @@ Get-EventLog -LogName System -Source "Service Control Manager" -Newest 20 | Wher
 
 **Install** butonuna tıklanarak kurulum başlatılır.
 
-**📷 Referans:** `5.png` - Installation confirmation ekranı
+**📷 Referans:** `Images/5.png` - Installation confirmation ekranı
 
 ---
 
@@ -324,7 +324,7 @@ Get-Printer | Measure-Object | Select-Object Count
 Get-Printer | Select-Object Name, PrinterStatus, JobCount
 ```
 
-**📷 Referans:** `7.png` - Windows Tools menüsü ve Print Management erişimi
+**📷 Referans:** `Images/7.png` - Windows Tools menüsü ve Print Management erişimi
 
 ---
 
@@ -366,7 +366,7 @@ Get-Printer -Name "Microsoft Print to PDF" | Format-List *
 Get-PrinterDriver | Select-Object Name, Manufacturer, PrinterEnvironment
 ```
 
-**📷 Referans:** `8.png` - Print Management konsolu ana ekranı
+**📷 Referans:** `Images/8.png` - Print Management konsolu ana ekranı
 
 ---
 
@@ -400,7 +400,7 @@ Add-PrinterDriver -Name "Microsoft XPS Document Writer v4"
 Add-Printer -Name "Network Printer" -DriverName "Microsoft XPS Document Writer v4" -PortName "IP_192.168.31.201"
 ```
 
-**📷 Referans:** `9.png` - Sağ tık menüsü ve Add Printer seçeneği
+**📷 Referans:** `Images/9.png` - Sağ tık menüsü ve Add Printer seçeneği
 
 ---
 
@@ -451,7 +451,7 @@ Add-PrinterPort -Name "IP_192.168.31.201" -PrinterHostAddress "192.168.31.201"
 Add-PrinterPort -Name "LPR_192.168.31.201" -LprHostAddress "192.168.31.201" -LprQueue "PASSTHRU"
 ```
 
-**📷 Referans:** `10.png` - Printer Installation yöntem seçimi
+**📷 Referans:** `Images/10.png` - Printer Installation yöntem seçimi
 
 ---
 
@@ -517,7 +517,7 @@ Test-NetConnection -ComputerName "192.168.31.201" -Port 161
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `11.png` - Printer Address girişi
+**📷 Referans:** `Images/11.png` - Printer Address girişi
 
 ---
 
@@ -565,7 +565,7 @@ Get-PrinterDriver -Name "Microsoft XPS Document Writer v4" | Format-List *
 Add-PrinterDriver -Name "HP LaserJet P3015" -InfPath "C:\Drivers\HP\hpbx3w81.inf"
 ```
 
-**📷 Referans:** `12.png` - Printer Driver seçimi
+**📷 Referans:** `Images/12.png` - Printer Driver seçimi
 
 ---
 
@@ -636,7 +636,7 @@ Get-PrinterDriver | Where-Object {$_.Manufacturer -like "*Microsoft*"}
 
 **Next** butonuna tıklanarak devam edilir.
 
-**📷 Referans:** `13.png` - Manufacturer ve model seçimi
+**📷 Referans:** `Images/13.png` - Manufacturer ve model seçimi
 
 ---
 
@@ -719,7 +719,7 @@ Get-ADObject -Filter 'objectClass -eq "printQueue"' -SearchBase "CN=Printers,DC=
 
 **Next** butonuna tıklanarak kurulum tamamlanır.
 
-**📷 Referans:** `14.png` - Printer Name and Sharing Settings
+**📷 Referans:** `Images/14.png` - Printer Name and Sharing Settings
 
 ---
 
@@ -784,8 +784,6 @@ Get-EventLog -LogName System -Source "Print" -Newest 10
 # Microsoft-Windows-PrintService event log
 Get-WinEvent -LogName "Microsoft-Windows-PrintService/Admin" -MaxEvents 20
 ```
-
-**📷 Referans:** `15.png` - Completing the Network Printer Installation Wizard
 
 ---
 
