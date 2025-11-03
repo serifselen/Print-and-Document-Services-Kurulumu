@@ -1,23 +1,24 @@
 # Windows Server 2025 - Yazıcı ve Belge Hizmetleri Kurulum Rehberi
 
 ## 📋 İçindekiler
-- [Genel Bakış](#-genel-bakış)
-- [Önkoşullar](#-önkoşullar)
-- [Kurulum Adımları](#-kurulum-adımları)
-- [Yapılandırma](#-yapılandırma)
-- [Sorun Giderme](#-sorun-giderme)
+- [Genel Bakış](#genel-bakış)
+- [Sistem Gereksinimleri](#sistem-gereksinimleri)
+- [Kurulum Adımları](#kurulum-adımları)
+- [Ağ Yazıcısı Yapılandırması](#ağ-yazıcısı-yapılandırması)
+- [Teknik Konfigürasyon](#teknik-konfigürasyon)
+- [Sorun Giderme](#sorun-giderme)
 
 ---
 
 ## 🎯 Genel Bakış
 
-Bu rehber, Windows Server 2025 üzerinde **Print and Document Services** rolünün kurulumunu ve ağ yazıcısı yapılandırmasını adım adım açıklamaktadır.
+Bu rehber, Windows Server 2025 işletim sistemi üzerinde **Print and Document Services** rolünün kurulumunu ve ağ yazıcısı ekleme işlemlerini adım adım açıklamaktadır. Bu kurulum ile merkezi yazıcı yönetimi sağlayabilir, ağ yazıcılarını yönetebilir ve çoklu platform yazdırma desteği sunabilirsiniz.
 
-> **Önemli Not:** Bu kurulum, Active Directory ve DNS yapılandırması tamamlanmış bir sunucu üzerinde gerçekleştirilmelidir.
+**Önemli Not:** Bu kurulumdan önce Active Directory ve DNS yapılandırmasının tamamlanmış olması gerekmektedir.
 
 ---
 
-## 🛠 Önkoşullar
+## 🖥️ Sistem Gereksinimleri
 
 ### Donanım Gereksinimleri
 | Bileşen | Minimum | Önerilen |
@@ -33,27 +34,43 @@ Bu rehber, Windows Server 2025 üzerinde **Print and Document Services** rolün�
 - [x] Remote Server Administration Tools
 - [x] Active Directory etki alanına katılım
 
+### Ağ Gereksinimleri
+- Statik IP adresi yapılandırılmış sunucu
+- Etki alanına katılım (DOMAIN.serifesien.local)
+- Ağ yazıcısı erişimi (192.168.31.201)
+
 ---
 
 ## 🚀 Kurulum Adımları
 
-### 1. Print and Document Services Rolünün Eklenmesi
+### 1. Adım: Server Manager'ı Başlatma
 
-#### 1.1. Server Manager'ı Açma
-- Sunucu Yöneticisi'ni açın
-- "Rol ve Özellik Ekle" seçeneğine tıklayın
+Sunucu Yöneticisi'ni açarak "Rol ve Özellik Ekle" sihirbazını başlatın.
 
 ![Server Manager Dashboard](Images/1.png)
+*Sunucu Yöneticisi Dashboard - Rol ve özellik ekleme sihirbazının başlatılacağı ana yönetim konsolu*
 
-#### 1.2. Yönetim Araçlarının Eklenmesi
-- **Print and Document Services** rolünü seçin
-- **Print and Document Services Tools** ekranında "Include management tools" seçeneğini işaretleyin
+### 2. Adım: Print and Document Services Rolünü Seçme
+
+Rol seçim ekranında **Print and Document Services** rolünü seçin. Bu rol, yazıcı ve belge hizmetlerinin merkezi yönetimini sağlar.
+
+![Print and Document Services Seçimi](Images/3.png)
+*Rol seçim ekranı - Print and Document Services rolünün seçildiği ve Type 3/Type 4 sürücü destek bilgilerinin görüntülendiği ekran*
+
+### 3. Adım: Yönetim Araçlarının Eklenmesi
+
+Print and Document Services rolü seçildiğinde, gerekli yönetim araçlarının eklenmesi için aşağıdaki adımları izleyin:
+
+- **Print and Document Services Tools** seçeneğini işaretleyin
+- **Include management tools** seçeneğini aktif edin
 - **Add Features** butonuna tıklayın
 
 ![Yönetim Araçları Ekleme](Images/2.png)
+*Gerekli yönetim araçlarının eklenmesi - Print and Document Services Tools bileşeninin seçimi*
 
-#### 1.3. Rol Servislerinin Seçimi
-Aşağıdaki rol servislerini seçin:
+### 4. Adım: Rol Servislerinin Seçimi
+
+Aşağıdaki rol servislerini seçerek kurulumu tamamlayın:
 
 | Rol Servisi | Açıklama | Gereksinimler |
 |-------------|----------|---------------|
@@ -62,13 +79,20 @@ Aşağıdaki rol servislerini seçin:
 | **LPD Service** | UNIX/Linux istemci desteği | İsteğe bağlı |
 
 ![Rol Servisleri Seçimi](Images/4.png)
+*Rol servisleri seçim ekranı - Print Server, Internet Printing ve LPD Service bileşenlerinin seçimi*
 
-#### 1.4. Kurulum Onayı
-Kurulum özetini kontrol edin ve **Install** butonuna tıklayın.
+### 5. Adım: Kurulum Onayı
+
+Kurulum özetini kontrol edin ve **Install** butonuna tıklayarak kurulumu başlatın.
 
 ![Kurulum Onayı](Images/5.png)
+*Kurulum onay ekranı - Seçilen bileşenlerin özet görünümü ve kurulum başlatma*
 
-### 2. Print Management Konsolu
+---
+
+## ⚙️ Ağ Yazıcısı Yapılandırması
+
+### 6. Adım: Print Management Konsolunu Açma
 
 Kurulum tamamlandıktan sonra Print Management konsolunu açın:
 
@@ -77,109 +101,169 @@ Kurulum tamamlandıktan sonra Print Management konsolunu açın:
 ```
 
 ![Print Management Konsolu](Images/7.png)
+*Print Management konsolu - Yazıcı yönetimi ve sürücü yönetimi merkezi arayüzü*
 
----
+### 7. Adım: Yazıcı Ekleme Sihirbazını Başlatma
 
-## ⚙️ Yapılandırma
+Print Management konsolundan **Add Printer** seçeneğini seçin.
 
-### 3. Ağ Yazıcısı Ekleme
+![Yazıcı Ekleme Menüsü](Images/8.png)
+*Yazıcı ekleme menüsü - Add Printer seçeneğinin bulunduğu arayüz*
 
-#### 3.1. Yazıcı Kurulum Sihirbazı
-- Print Management konsolundan **Add Printer** seçeneğini seçin
-- **Add an IPP, TCP/IP, or Web Services Printer by IP address or hostname** seçeneğini işaretleyin
+### 8. Adım: Kurulum Yöntemi Seçimi
+
+Ağ yazıcısı eklemek için aşağıdaki seçeneği işaretleyin:
+
+**"Add an IPP, TCP/IP, or Web Services Printer by IP address or hostname"**
 
 ![Kurulum Yöntemi Seçimi](Images/9.png)
+*Kurulum yöntemi seçimi - TCP/IP, IPP veya Web Services protokolleri ile ağ yazıcısı ekleme*
 
-#### 3.2. Yazıcı Ağ Ayarları
-| Ayar | Değer |
-|------|-------|
-| **Type of Device** | TCP/IP Device |
-| **Host name or IP address** | 192.168.31.201 |
-| **Port name** | 192.168.31.201 |
+### 9. Adım: Yazıcı Ağ Ayarları
+
+Aşağıdaki ağ ayarlarını girerek devam edin:
+
+| Ayar | Değer | Açıklama |
+|------|-------|----------|
+| **Type of Device** | TCP/IP Device | Ağ yazıcısı türü |
+| **Host name or IP address** | 192.168.31.201 | Yazıcının ağ adresi |
+| **Port name** | 192.168.31.201 | Otomatik oluşturulan port adı |
 
 ![Yazıcı Ağ Ayarları](Images/10.png)
+*Yazıcı ağ ayarları - TCP/IP cihaz türü ve IP adresi yapılandırması*
 
-#### 3.3. Yazıcı Sürücüsü Yükleme
+### 10. Adım: Yazıcı Sürücüsünü Yükleme
+
+Sürücü yükleme işlemi için aşağıdaki adımları izleyin:
+
 - **Install a new driver** seçeneğini seçin
-- **Manufacturer:** Microsoft
-- **Printers:** Microsoft MS-XPS Class Driver 2
+- **Manufacturer** bölümünden **Microsoft**'u seçin
+- **Printers** listesinden **Microsoft MS-XPS Class Driver 2**'yi seçin
 
-![Sürücü Seçimi](Images/11.png)
+![Sürücü Seçim Ekranı](Images/11.png)
+*Sürücü seçim ekranı - Yeni sürücü yükleme seçeneğinin seçimi*
+
 ![Sürücü Model Seçimi](Images/12.png)
+*Sürücü model seçimi - Microsoft MS-XPS Class Driver 2'nin seçimi ve dijital imza bilgisi*
 
-#### 3.4. Yazıcı Paylaşım Ayarları
-| Ayar | Değer |
-|------|-------|
-| **Printer Name** | Microsoft MS-XPS Class Driver 2 |
-| **Share this printer** | Evet |
-| **Share Name** | Microsoft MS-XPS Class Driver 2 |
+### 11. Adım: Yazıcı Paylaşım Ayarları
+
+Aşağıdaki paylaşım ayarlarını girerek yazıcıyı ağ üzerinden paylaşın:
+
+| Ayar | Değer | Açıklama |
+|------|-------|----------|
+| **Printer Name** | Microsoft MS-XPS Class Driver 2 | Sistemde görünecek yazıcı adı |
+| **Share this printer** | Evet | Ağ paylaşımını aktif et |
+| **Share Name** | Microsoft MS-XPS Class Driver 2 | Ağ üzerinden görünecek ad |
 
 ![Paylaşım Ayarları](Images/13.png)
+*Yazıcı paylaşım ayarları - Yazıcı adı ve paylaşım ayarlarının yapılandırılması*
 
-#### 3.5. Kurulum Tamamlama
-Kurulumun başarıyla tamamlandığını doğrulayın.
+### 12. Adım: Kurulumun Tamamlanması
+
+Kurulumun başarıyla tamamlandığını aşağıdaki mesajlarla doğrulayın:
+
+- ✅ **Driver installation succeeded**
+- ✅ **Printer installation succeeded**
 
 ![Kurulum Tamamlandı](Images/14.png)
+*Kurulum tamamlama ekranı - Başarılı kurulum mesajları ve test sayfası yazdırma seçeneği*
 
 ---
 
-## 🔧 Sorun Giderme
+## 🔧 Teknik Konfigürasyon
+
+### Yazıcı Sürücü Türleri ve Özellikleri
+
+| Özellik | Type 3 (v3) Sürücü | Type 4 (v4) Sürücü |
+|---------|-------------------|-------------------|
+| **Güvenlik Modeli** | Kernel Mode | User Mode |
+| **Kullanıcı İzinleri** | Yönetici hakları gerekli | Yönetici hakları gerekmez |
+| **32/64-bit Desteği** | Ayrı sürücüler gerekli | Tek sürücü yeterli |
+| **Dijital İmza** | Zorunlu değil | Zorunlu |
+| **Microsoft Önerisi** | ❌ | ✅ |
+
+### Güvenlik Yapılandırması
+
+```powershell
+# Point and Print Restrictions politikası
+Computer Configuration -> Administrative Templates -> Printers
+- Point and Print Restrictions: Enabled
+- Users can only point and print to these servers: 192.168.31.201
+```
+
+### Ağ Güvenlik Ayarları
+
+```powershell
+# Gerekli portların açılması
+New-NetFirewallRule -DisplayName "Print Spooler" -Direction Inbound -Protocol TCP -LocalPort 135,445 -Action Allow
+New-NetFirewallRule -DisplayName "Internet Printing" -Direction Inbound -Protocol TCP -LocalPort 80,443 -Action Allow
+```
+
+---
+
+## 🛠️ Sorun Giderme
 
 ### Sık Karşılaşılan Sorunlar ve Çözümleri
 
-#### 1. Yazıcı Bağlantı Sorunları
+#### Yazıcı Bağlantı Sorunları
 ```powershell
-# Yazıcı durumunu kontrol et
-Get-Printer -ComputerName localhost
+# Yazıcı durumunu kontrol etme
+Get-Printer -ComputerName localhost | Format-Table Name, PrinterStatus, Shared
 
-# Ağ bağlantısını test et
+# Ağ bağlantısını test etme
 Test-NetConnection -ComputerName 192.168.31.201 -Port 9100
 
-# Spooler servisini yeniden başlat
+# Spooler servisini yeniden başlatma
 Restart-Service -Name Spooler -Force
 ```
 
-#### 2. Sürücü Sorunları
+#### Sürücü Sorunları
 ```powershell
-# Yüklü sürücüleri listele
-Get-PrinterDriver -ComputerName localhost
+# Yüklü sürücüleri listeleme
+Get-PrinterDriver -ComputerName localhost | Format-Table Name, Manufacturer, DriverVersion
 
-# Sürücüyü kaldır ve yeniden yükle
+# Sorunlu sürücüyü kaldırma ve yeniden yükleme
 Remove-PrinterDriver -Name "Microsoft MS-XPS Class Driver 2"
+Add-PrinterDriver -Name "Microsoft MS-XPS Class Driver 2"
 ```
 
-#### 3. İzin Sorunları
-- Yazıcı paylaşım izinlerini kontrol edin
-- Güvenlik duvarı ayarlarını doğrulayın
-- Grup politikası ayarlarını kontrol edin
-
-### Performans İzleme
+#### Performans İzleme
 ```powershell
-# Yazıcı kuyruğunu izle
+# Yazıcı kuyruğunu izleme
 Get-PrintJob -PrinterName "Microsoft MS-XPS Class Driver 2"
 
-# Performans sayaçlarını kontrol et
-Get-Counter "\Print Queue(*)\Jobs"
+# Performans sayaçlarını kontrol etme
+Get-Counter "\Print Queue(*)\Jobs" -SampleInterval 5 -MaxSamples 10
 ```
 
----
+### Kurulum Sonrası Kontrol Listesi
 
-## ✅ Doğrulama ve Test
-
-### Kurulum Sonrası Kontroller
 - [ ] Yazıcı "Ready" durumunda görünüyor
 - [ ] Test sayfası başarıyla yazdırılıyor
 - [ ] Ağ üzerinden erişim sağlanabiliyor
 - [ ] Kullanıcı izinleri doğru çalışıyor
+- [ ] Grup politikası uygulanıyor
 
-### Komut Satırı Doğrulama
-```powershell
-# Tüm yazıcıları listele
-Get-Printer | Format-Table Name, PrinterStatus, Shared
+---
 
-# Yazıcı sürücülerini kontrol et
-Get-PrinterDriver | Format-Table Name, DriverVersion
-```
+## ✅ Sonuç
+
+Bu rehber, Windows Server 2025 üzerinde **Print and Document Services** rolünün başarılı bir şekilde kurulumunu ve ağ yazıcısı yapılandırmasını tamamlamanızı sağlamıştır.
+
+### 🎯 Başarı Metrikleri
+- ✅ Yazıcı sunucusu rolü başarıyla yüklendi
+- ✅ Ağ yazıcısı başarıyla eklendi ve paylaşıma açıldı
+- ✅ Type 4 sürücülerle güvenlik en iyi uygulamaları uygulandı
+- ✅ Çoklu platform desteği sağlandı
+
+### 🔄 Bakım Önerileri
+- Düzenli yazıcı sürücü güncellemeleri
+- Performans izleme ve optimizasyon
+- Güvenlik güncellemelerinin takibi
+- Yedekleme ve felaket kurtarma planı
+
+> **Önemli:** Üretim ortamlarında bu kurulumu gerçekleştirmeden önce test ortamında doğrulama yapmanız önerilir.
 
 ---
 
@@ -187,22 +271,11 @@ Get-PrinterDriver | Format-Table Name, DriverVersion
 
 Sorunlarla karşılaşırsanız aşağıdaki adımları izleyin:
 
-1. Windows Event Logları kontrol edin
-2. Print Spooler servis durumunu doğrulayın
-3. Ağ bağlantısını test edin
+1. Windows Event Logları kontrol edin: `Event Viewer -> Applications and Services Logs -> Microsoft -> Windows -> PrintService`
+2. Print Spooler servis durumunu doğrulayın: `services.msc`
+3. Ağ bağlantısını test edin: `ping 192.168.31.201`
 4. Güvenlik duvarı ayarlarını kontrol edin
 
 ---
 
-## 🔗 Yararlı Bağlantılar
-
-- [Windows Server 2025 Kurulum Rehberi](https://github.com/serifselen/Windows-Server-2025-Kurulum)
-- [Active Directory ve DNS Kurulum Rehberi](https://github.com/serifselen/Active-Directory-ve-DNS-Kurulum)
-- [Microsoft Print Services Dokümantasyonu](https://docs.microsoft.com/tr-tr/windows-server/administration/print-services/print-services-overview)
-
----
-
-**Not:** Bu rehber, Windows Server 2025 için güncel olarak hazırlanmıştır. Önceki sürümlerde bazı adımlar farklılık gösterebilir.
-
----
-*Son güncelleme: Aralık 2024*
+**Not:** Bu rehber, Windows Server 2025 için güncel olarak hazırlanmıştır. Önceki Windows Server sürümlerinde bazı adımlar farklılık gösterebilir.
