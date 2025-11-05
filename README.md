@@ -934,4 +934,4 @@ function Test-PrinterBestPractices {
 > ⚠️ **Önemli Not:** Bu doküman eğitim ve test ortamları için hazırlanmıştır. Üretim ortamlarında lisanslı yazılım ve güvenlik önlemleri kullanılmalıdır.
 
 > 📧 **Destek İçin**: [mserifselen@gmail.com](mailto:mserifselen@gmail.com)  
-> 🔗 **GitHub Repository**: [https://github.com/serifselen/Print-and-Document-Services-Kurulumu](https://github.com/serifselen/Print-and-Document-Services-Kurulumu)
+> 🔗 **GitHub Repository**: [https://github.com/serifselen/](https://github.com/serifselen/)
